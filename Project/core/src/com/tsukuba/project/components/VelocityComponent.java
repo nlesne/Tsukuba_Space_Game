@@ -1,15 +1,19 @@
 package com.tsukuba.project.components;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
-public class VelocityComponent {
-    public Vector2 velocity;
+public class VelocityComponent implements Component {
+    public float dx;
+    public float dy;
 
     public VelocityComponent(float dx, float dy) {
-        velocity = new Vector2(dx,dy);
+        this.dx = dx;
+        this.dy = dy;
     }
 
     public VelocityComponent() {
-        velocity = new Vector2();
+        this.dx = 0;
+        this.dy = 0;
     }
 }
