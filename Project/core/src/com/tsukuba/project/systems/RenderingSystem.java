@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem{
-    private ImmutableArray<Entity> entities;
 
     static final float GAME_WIDTH = 10;
     static final float GAME_HEIGHT = 10;
@@ -79,17 +78,7 @@ public class RenderingSystem extends SortedIteratingSystem{
     }
 
     @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-    }
-
-    @Override
     protected void processEntity(Entity entity, float deltaTime) {
         renderQueue.add(entity);
-    }
-
-    @Override
-    public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.all(TransformComponent.class,DrawableComponent.class).get());
     }
 }
