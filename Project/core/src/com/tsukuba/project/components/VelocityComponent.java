@@ -4,16 +4,16 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
 public class VelocityComponent implements Component {
-    public float dx;
-    public float dy;
+    public Vector2 velocity;
+    public Vector2 acceleration;
 
-    public VelocityComponent(float dx, float dy) {
-        this.dx = dx;
-        this.dy = dy;
+    public VelocityComponent(Vector2 velocity, Vector2 acceleration) {
+        this.velocity = new Vector2(velocity);
+        this.acceleration = new Vector2(acceleration);
     }
 
     public VelocityComponent() {
-        this.dx = 0;
-        this.dy = 0;
+        velocity = new Vector2(0.0f,0.0f);
+        acceleration = new Vector2(0.0f,0.0f);
     }
 }
