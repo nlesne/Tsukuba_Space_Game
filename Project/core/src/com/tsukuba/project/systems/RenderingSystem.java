@@ -17,8 +17,8 @@ import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem{
 
-    static final float GAME_WIDTH = 10;
-    static final float GAME_HEIGHT = 10;
+    static final float GAME_WIDTH = 32;
+    static final float GAME_HEIGHT = 32;
     static final float PIXEL_METER_RATIO = 1.0f / 32.0f;
 
     private SpriteBatch batch;
@@ -80,5 +80,9 @@ public class RenderingSystem extends SortedIteratingSystem{
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         renderQueue.add(entity);
+    }
+
+    public OrthographicCamera getCamera() {
+        return camera;
     }
 }

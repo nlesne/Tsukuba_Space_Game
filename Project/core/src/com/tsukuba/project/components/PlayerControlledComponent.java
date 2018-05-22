@@ -1,4 +1,6 @@
 package com.tsukuba.project.components;
 
-public class PlayerControlledComponent {
+import com.badlogic.ashley.core.Component;
+
+public class PlayerControlledComponent implements Component {
 }

@@ -4,9 +4,5 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class DrawableComponent implements Component {
-    public TextureRegion sprite;
-
-    public DrawableComponent(TextureRegion sprite) {
-        this.sprite = sprite;
-    }
+    public TextureRegion sprite = new TextureRegion();
 }
