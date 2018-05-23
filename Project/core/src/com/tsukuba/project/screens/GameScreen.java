@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.DrawableComponent;
+import com.tsukuba.project.components.EnnemyComponent;
 import com.tsukuba.project.components.MovementComponent;
 import com.tsukuba.project.components.PlayerControlledComponent;
 import com.tsukuba.project.components.TransformComponent;
@@ -33,20 +34,45 @@ public class GameScreen extends ScreenAdapter {
     public GameScreen(SpaceGame game) {
         this.game = game;
         engine = new PooledEngine();
+        
+        //Player
         Entity movingEntity = new Entity();
-        Texture texture = new Texture(Gdx.files.internal("badlogic.jpg"));
-
+        Texture texture = new Texture(Gdx.files.internal("spaceship.jpg"));
+        
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.position.set(16,16,0);
+        transform.scale.set(new Vector2(0.1f,0.1f));
 
         MovementComponent movement = engine.createComponent(MovementComponent.class);
         movement.velocity.set(0.5f,0f);
 
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
-        drawable.sprite.setRegion(new TextureRegion(texture,0,0,64,64));
-
+        drawable.sprite.setRegion(new TextureRegion(texture,0,0,900,1440));
+        
         PlayerControlledComponent playerControlled = engine.createComponent(PlayerControlledComponent.class);
+        //End Player
+        
+        
+        //Ennemy
+        Entity ennemyEntity = new Entity();
+        Texture textureEnnemy = new Texture(Gdx.files.internal("ennemy.png"));
+        
+        TransformComponent transformEnnemy = engine.createComponent(TransformComponent.class);
+        transformEnnemy.position.set(16,16,0);
+        transformEnnemy.scale.set(new Vector2(0.25f,0.25f));
 
+        DrawableComponent drawableEnnemy = engine.createComponent(DrawableComponent.class);
+        drawableEnnemy.sprite.setRegion(new TextureRegion(textureEnnemy,0,0,340,420));
+        
+        EnnemyComponent ennemy = engine.createComponent(EnnemyComponent.class);
+        //End Ennemy
+       
+
+        ennemyEntity.add(transformEnnemy);
+        ennemyEntity.add(drawableEnnemy);
+        ennemyEntity.add(ennemy);
+        engine.addEntity(ennemyEntity);
+        
         movingEntity.add(transform);
         movingEntity.add(movement);
         movingEntity.add(drawable);
@@ -61,15 +87,27 @@ public class GameScreen extends ScreenAdapter {
     public void render(float delta) {
         engine.update(delta);
         
-        OrthographicCamera camera = engine.getSystem(RenderingSystem.class).getCamera();
         game.batch.setProjectionMatrix(camera.combined);
         
         Family player = Family.all(PlayerControlledComponent.class).get();
         ImmutableArray<Entity> entity = engine.getEntitiesFor(player);
         Entity playerEntity = entity.first();
         
+        Family ennemies = Family.all(EnnemyComponent.class).get();
+        ImmutableArray<Entity> ennemyEntity = engine.getEntitiesFor(ennemies);
+        
         handleCamera(camera, playerEntity, delta);
         handleInput(playerEntity);
+        indicatorEnnemies(camera,ennemyEntity,delta);
+    }
+    
+    private void indicatorEnnemies(OrthographicCamera camera, ImmutableArray<Entity> entities, float delta) {
+    	for(Entity e: entities){
+    		TransformComponent transform = tm.get(e);
+    		if(!camera.frustum.pointInFrustum(transform.position)) {
+        		System.out.println("oui");
+    		}    
+    	}
     }
     
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
@@ -79,6 +117,7 @@ public class GameScreen extends ScreenAdapter {
     		camera.position.set(transform.position.x,transform.position.y,0);
     		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
     	}
+    	
     	
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.zoom += 0.02;
