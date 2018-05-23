@@ -12,12 +12,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.tsukuba.project.SpaceGame;
-import com.tsukuba.project.components.DrawableComponent;
-import com.tsukuba.project.components.MovementComponent;
-import com.tsukuba.project.components.PlayerControlledComponent;
-import com.tsukuba.project.components.TransformComponent;
+import com.tsukuba.project.components.*;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
 
@@ -25,8 +21,6 @@ public class GameScreen extends ScreenAdapter {
 
     private SpaceGame game;
     private PooledEngine engine;
-    private ComponentMapper<MovementComponent> vm = ComponentMapper.getFor(MovementComponent.class);
-    private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
 
     private boolean camera_lock = true;
     
@@ -45,7 +39,7 @@ public class GameScreen extends ScreenAdapter {
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
         drawable.sprite.setRegion(new TextureRegion(texture,0,0,64,64));
 
-        PlayerControlledComponent playerControlled = engine.createComponent(PlayerControlledComponent.class);
+        PlayerComponent playerControlled = engine.createComponent(PlayerComponent.class);
 
         movingEntity.add(transform);
         movingEntity.add(movement);
@@ -64,7 +58,7 @@ public class GameScreen extends ScreenAdapter {
         OrthographicCamera camera = engine.getSystem(RenderingSystem.class).getCamera();
         game.batch.setProjectionMatrix(camera.combined);
         
-        Family player = Family.all(PlayerControlledComponent.class).get();
+        Family player = Family.all(PlayerComponent.class).get();
         ImmutableArray<Entity> entity = engine.getEntitiesFor(player);
         Entity playerEntity = entity.first();
         
@@ -75,7 +69,7 @@ public class GameScreen extends ScreenAdapter {
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
     	
     	if(camera_lock) {
-    		TransformComponent transform = tm.get(playerEntity);
+    		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
     		camera.position.set(transform.position.x,transform.position.y,0);
     		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
     	}
@@ -129,7 +123,7 @@ public class GameScreen extends ScreenAdapter {
             accelY = -0.2f;
         }
 
-        MovementComponent movement = vm.get(playerEntity);
+        MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
         movement.velocity.add(new Vector2(accelX,accelY));
     }
 }
