@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.DrawableComponent;
 import com.tsukuba.project.components.MovementComponent;
-import com.tsukuba.project.components.PlayerControlledComponent;
+import com.tsukuba.project.components.PlayerComponent;
 import com.tsukuba.project.components.TransformComponent;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
@@ -41,7 +41,7 @@ public class GameScreen extends ScreenAdapter {
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
         drawable.sprite.setRegion(new TextureRegion(texture,0,0,64,64));
 
-        PlayerControlledComponent playerControlled = engine.createComponent(PlayerControlledComponent.class);
+        PlayerComponent playerControlled = engine.createComponent(PlayerComponent.class);
 
         movingEntity.add(transform);
         movingEntity.add(movement);
@@ -59,7 +59,7 @@ public class GameScreen extends ScreenAdapter {
         OrthographicCamera camera = engine.getSystem(RenderingSystem.class).getCamera();
         game.batch.setProjectionMatrix(camera.combined);
 
-        Family player = Family.all(PlayerControlledComponent.class).get();
+        Family player = Family.all(PlayerComponent.class).get();
         ImmutableArray<Entity> entity = engine.getEntitiesFor(player);
         Entity playerEntity = entity.first();
 
