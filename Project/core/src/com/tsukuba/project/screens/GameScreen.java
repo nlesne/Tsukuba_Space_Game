@@ -12,13 +12,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.tsukuba.project.SpaceGame;
-import com.tsukuba.project.components.DrawableComponent;
-import com.tsukuba.project.components.EnnemyComponent;
-import com.tsukuba.project.components.MovementComponent;
-import com.tsukuba.project.components.PlayerControlledComponent;
-import com.tsukuba.project.components.TransformComponent;
+import com.tsukuba.project.components.*;
+import com.tsukuba.project.systems.IndicatorSystem;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
 
@@ -26,8 +22,7 @@ public class GameScreen extends ScreenAdapter {
 
     private SpaceGame game;
     private PooledEngine engine;
-    private ComponentMapper<MovementComponent> vm = ComponentMapper.getFor(MovementComponent.class);
-    private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
+    private OrthographicCamera camera;
 
     private boolean camera_lock = true;
     
@@ -40,7 +35,7 @@ public class GameScreen extends ScreenAdapter {
         Texture texture = new Texture(Gdx.files.internal("spaceship.jpg"));
         
         TransformComponent transform = engine.createComponent(TransformComponent.class);
-        transform.position.set(16,16,0);
+        transform.position.set(32,32,0);
         transform.scale.set(new Vector2(0.1f,0.1f));
 
         MovementComponent movement = engine.createComponent(MovementComponent.class);
@@ -49,7 +44,7 @@ public class GameScreen extends ScreenAdapter {
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
         drawable.sprite.setRegion(new TextureRegion(texture,0,0,900,1440));
         
-        PlayerControlledComponent playerControlled = engine.createComponent(PlayerControlledComponent.class);
+        PlayerComponent playerControlled = engine.createComponent(PlayerComponent.class);
         //End Player
         
         
@@ -58,7 +53,7 @@ public class GameScreen extends ScreenAdapter {
         Texture textureEnnemy = new Texture(Gdx.files.internal("ennemy.png"));
         
         TransformComponent transformEnnemy = engine.createComponent(TransformComponent.class);
-        transformEnnemy.position.set(16,16,0);
+        transformEnnemy.position.set(0,0,0);
         transformEnnemy.scale.set(new Vector2(0.25f,0.25f));
 
         DrawableComponent drawableEnnemy = engine.createComponent(DrawableComponent.class);
@@ -80,16 +75,16 @@ public class GameScreen extends ScreenAdapter {
         engine.addEntity(movingEntity);
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
-
+        camera = engine.getSystem(RenderingSystem.class).getCamera();
+        engine.addSystem(new IndicatorSystem(camera));
+        game.batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
     public void render(float delta) {
-        engine.update(delta);
+        engine.update(delta);        
         
-        game.batch.setProjectionMatrix(camera.combined);
-        
-        Family player = Family.all(PlayerControlledComponent.class).get();
+        Family player = Family.all(PlayerComponent.class).get();
         ImmutableArray<Entity> entity = engine.getEntitiesFor(player);
         Entity playerEntity = entity.first();
         
@@ -98,22 +93,13 @@ public class GameScreen extends ScreenAdapter {
         
         handleCamera(camera, playerEntity, delta);
         handleInput(playerEntity);
-        indicatorEnnemies(camera,ennemyEntity,delta);
     }
-    
-    private void indicatorEnnemies(OrthographicCamera camera, ImmutableArray<Entity> entities, float delta) {
-    	for(Entity e: entities){
-    		TransformComponent transform = tm.get(e);
-    		if(!camera.frustum.pointInFrustum(transform.position)) {
-        		System.out.println("oui");
-    		}    
-    	}
-    }
+   
     
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
     	
     	if(camera_lock) {
-    		TransformComponent transform = tm.get(playerEntity);
+    		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
     		camera.position.set(transform.position.x,transform.position.y,0);
     		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
     	}
@@ -168,7 +154,7 @@ public class GameScreen extends ScreenAdapter {
             accelY = -0.2f;
         }
 
-        MovementComponent movement = vm.get(playerEntity);
+        MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
         movement.velocity.add(new Vector2(accelX,accelY));
     }
 }

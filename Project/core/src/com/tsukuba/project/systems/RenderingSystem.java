@@ -9,6 +9,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.tsukuba.project.components.ComponentList;
 import com.tsukuba.project.components.DrawableComponent;
 import com.tsukuba.project.components.TransformComponent;
 
@@ -24,9 +25,6 @@ public class RenderingSystem extends SortedIteratingSystem{
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private ArrayList<Entity> renderQueue;
-
-    private ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
-    private ComponentMapper<DrawableComponent> dm = ComponentMapper.getFor(DrawableComponent.class);
 
     public RenderingSystem(SpriteBatch batch) {
         super(Family.all(DrawableComponent.class,TransformComponent.class).get(), new ZComparator());
@@ -54,12 +52,12 @@ public class RenderingSystem extends SortedIteratingSystem{
         batch.begin();
 
         for (Entity e : renderQueue) {
-            DrawableComponent edc = dm.get(e);
+            DrawableComponent edc = ComponentList.DRAWABLE.get(e);
 
             if (edc.sprite == null)
                 continue;
 
-            TransformComponent etc = tm.get(e);
+            TransformComponent etc = ComponentList.TRANSFORM.get(e);
 
             float w = edc.sprite.getRegionWidth();
             float h = edc.sprite.getRegionHeight();
