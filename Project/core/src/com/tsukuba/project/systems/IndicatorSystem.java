@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.tsukuba.project.components.ComponentList;
 import com.tsukuba.project.components.EnnemyComponent;
 import com.tsukuba.project.components.PlayerComponent;
@@ -23,15 +24,16 @@ public class IndicatorSystem extends IteratingSystem {
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
 	private Texture texture;
-	private TextureRegion region;
+	private Sprite sprite;
 
     public IndicatorSystem(OrthographicCamera camera) {
         super(Family.all(EnnemyComponent.class).get());
         
         this.camera = camera;
         texture = new Texture(Gdx.files.internal("arrow.png"));
-        region = new TextureRegion(texture);
+        sprite = new Sprite(texture);
         batch = new SpriteBatch();
+        sprite.flip(true, false);
     }
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
@@ -44,10 +46,20 @@ public class IndicatorSystem extends IteratingSystem {
     	TransformComponent position = ComponentList.TRANSFORM.get(entity);
         		
    		if(!camera.frustum.pointInFrustum(position.position)) {
-   			
    			double theta = Math.atan2(position.position.y-positionPlayer.position.y,position.position.x-positionPlayer.position.x);
-   	
-   			
+   			//theta = theta*180/Math.PI;
+   					
+   			batch.begin();
+   			float spritePosX = (float) (300+150*Math.cos(theta));
+   			float spritePosY = (float) (220+150*Math.sin(theta));
+   			sprite.setPosition(spritePosX,spritePosY);	
+   			sprite.setRotation((float) (MathUtils.radiansToDegrees*theta));
+   			sprite.setSize(20, 20);
+   			sprite.setOriginCenter();
+   			//sprite.rotate((float) theta);
+   			sprite.draw(batch);
+   			//batch.draw(texture, (float) (2*Math.cos(theta)), (float) (2*Math.sin(theta)), 15, 15);
+   			batch.end();
    		}    
     }
 }

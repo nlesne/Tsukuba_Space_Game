@@ -35,7 +35,7 @@ public class GameScreen extends ScreenAdapter {
         Texture texture = new Texture(Gdx.files.internal("spaceship.jpg"));
         
         TransformComponent transform = engine.createComponent(TransformComponent.class);
-        transform.position.set(32,32,0);
+        transform.position.set(16,16,0);
         transform.scale.set(new Vector2(0.1f,0.1f));
 
         MovementComponent movement = engine.createComponent(MovementComponent.class);
@@ -53,7 +53,7 @@ public class GameScreen extends ScreenAdapter {
         Texture textureEnnemy = new Texture(Gdx.files.internal("ennemy.png"));
         
         TransformComponent transformEnnemy = engine.createComponent(TransformComponent.class);
-        transformEnnemy.position.set(0,0,0);
+        transformEnnemy.position.set(16,16,0);
         transformEnnemy.scale.set(new Vector2(0.25f,0.25f));
 
         DrawableComponent drawableEnnemy = engine.createComponent(DrawableComponent.class);
@@ -61,8 +61,27 @@ public class GameScreen extends ScreenAdapter {
         
         EnnemyComponent ennemy = engine.createComponent(EnnemyComponent.class);
         //End Ennemy
+        
+        //Ennemy
+        Entity ennemyEntity2 = new Entity();
+        Texture textureEnnemy2 = new Texture(Gdx.files.internal("ennemy.png"));
+        
+        TransformComponent transformEnnemy2 = engine.createComponent(TransformComponent.class);
+        transformEnnemy2.position.set(9,9,0);
+        transformEnnemy2.scale.set(new Vector2(0.25f,0.25f));
+
+        DrawableComponent drawableEnnemy2 = engine.createComponent(DrawableComponent.class);
+        drawableEnnemy2.sprite.setRegion(new TextureRegion(textureEnnemy,0,0,340,420));
+        
+        EnnemyComponent ennemy2 = engine.createComponent(EnnemyComponent.class);
+        //End Ennemy
        
 
+        ennemyEntity2.add(transformEnnemy2);
+        ennemyEntity2.add(drawableEnnemy2);
+        ennemyEntity2.add(ennemy2);
+        engine.addEntity(ennemyEntity2);
+        
         ennemyEntity.add(transformEnnemy);
         ennemyEntity.add(drawableEnnemy);
         ennemyEntity.add(ennemy);
@@ -73,6 +92,7 @@ public class GameScreen extends ScreenAdapter {
         movingEntity.add(drawable);
         movingEntity.add(playerControlled);
         engine.addEntity(movingEntity);
+        
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
         camera = engine.getSystem(RenderingSystem.class).getCamera();
