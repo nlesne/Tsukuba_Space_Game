@@ -1,14 +1,12 @@
 package com.tsukuba.project.systems;
 
-import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.components.ComponentList;
-import com.tsukuba.project.components.TransformComponent;
 import com.tsukuba.project.components.MovementComponent;
+import com.tsukuba.project.components.TransformComponent;
 
 public class MovementSystem extends IteratingSystem {
 
@@ -22,8 +20,8 @@ public class MovementSystem extends IteratingSystem {
         MovementComponent movement = ComponentList.MOVEMENT.get(entity);
 
         Vector2 tmp = new Vector2();
-
         tmp.set(movement.acceleration).scl(deltaTime);
+
         movement.velocity.add(tmp);
 
         tmp.set(movement.velocity).scl(deltaTime);
