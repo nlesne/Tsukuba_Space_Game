@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
+import com.tsukuba.project.entities.PlayerShipFactory;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
 
@@ -27,25 +28,8 @@ public class GameScreen extends ScreenAdapter {
     public GameScreen(SpaceGame game) {
         this.game = game;
         engine = new PooledEngine();
-        Entity movingEntity = new Entity();
-        Texture texture = new Texture(Gdx.files.internal("badlogic.jpg"));
+        PlayerShipFactory.create(engine,16,16);
 
-        TransformComponent transform = engine.createComponent(TransformComponent.class);
-        transform.position.set(16,16,0);
-
-        MovementComponent movement = engine.createComponent(MovementComponent.class);
-        movement.velocity.set(0.5f,0f);
-
-        DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
-        drawable.sprite.setRegion(new TextureRegion(texture,0,0,64,64));
-
-        PlayerComponent playerControlled = engine.createComponent(PlayerComponent.class);
-
-        movingEntity.add(transform);
-        movingEntity.add(movement);
-        movingEntity.add(drawable);
-        movingEntity.add(playerControlled);
-        engine.addEntity(movingEntity);
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
 

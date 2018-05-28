@@ -6,14 +6,16 @@ import com.badlogic.gdx.utils.Pool;
 
 public class AIComponent implements Component, Pool.Poolable {
 
-    public enum AIState {WANDER,SEEK,IDLE,FLEE,AIM}
+    public enum AIState {WANDER,CHARGE,IDLE,FLEE,AIM}
 
     public AIState state = AIState.IDLE;
+    public float detectionRadius;
     public Entity target;
 
     @Override
     public void reset() {
         state = AIState.IDLE;
         target = null;
+        detectionRadius = 0f;
     }
 }

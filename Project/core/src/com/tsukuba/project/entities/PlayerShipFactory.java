@@ -2,18 +2,18 @@ package com.tsukuba.project.entities;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.assets.AssetManager;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.*;
 
 public class PlayerShipFactory {
 
-    public static Entity create(PooledEngine engine) {
+    public static Entity create(PooledEngine engine, float x, float y) {
         PlayerComponent playerComponent = engine.createComponent(PlayerComponent.class);
         DrawableComponent drawableComponent = engine.createComponent(DrawableComponent.class);
         drawableComponent.sprite = Assets.playership;
 
         TransformComponent transformComponent = engine.createComponent(TransformComponent.class);
+        transformComponent.position.set(x,y,0);
         HealthComponent healthComponent = engine.createComponent(HealthComponent.class);
         healthComponent.maxHealth = 3;
         healthComponent.currentHealth = healthComponent.maxHealth;
