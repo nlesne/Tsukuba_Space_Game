@@ -10,6 +10,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -101,7 +103,7 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new RenderingSystem(game.batch));
         camera = engine.getSystem(RenderingSystem.class).getCamera();
         engine.addSystem(new IndicatorSystem(camera));
-        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.setProjectionMatrix(camera.combined);                      
     }
 
     @Override
@@ -116,7 +118,7 @@ public class GameScreen extends ScreenAdapter {
         ImmutableArray<Entity> ennemyEntity = engine.getEntitiesFor(ennemies);
         
         handleCamera(camera, playerEntity, delta);
-        handleInput(playerEntity);
+        handleInput(playerEntity,delta); 
     }
    
     
@@ -158,7 +160,7 @@ public class GameScreen extends ScreenAdapter {
 		}
     }
     
-    private void handleInput(Entity playerEntity) {
+    private void handleInput(Entity playerEntity, float delta) {
     	
     	MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
         TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
@@ -168,28 +170,22 @@ public class GameScreen extends ScreenAdapter {
         float rotation = transform.rotation;
         
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-        	rotation += 0.06f;
+        	rotation += 0.03f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-        	rotation -= 0.06f;
+        	rotation -= 0.03f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            accelX = (float) (0.1*Math.cos(Math.toDegrees(rotation)+Math.PI/2));
-            accelY = (float) (0.1*Math.sin(Math.toDegrees(rotation)+Math.PI/2));
+            accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
+            accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-        	accelX = (float) -(0.1*Math.cos(Math.toDegrees(rotation)+Math.PI/2));
-            accelY = (float) -(0.1*Math.sin(Math.toDegrees(rotation)+Math.PI/2));
+        	accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
+        	accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
         }
-        
-        
-        
+         
         movement.velocity.add(new Vector2(accelX,accelY));
         transform.rotation=rotation;   
-        
-        shape.begin(ShapeType.Line);
-        shape.setColor(1, 1, 0, 1);
-        shape.line(350, 250, 350+movement.velocity.x, 250+movement.velocity.y);
-        shape.end();
+       
     }
 }

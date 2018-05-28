@@ -56,9 +56,7 @@ public class IndicatorSystem extends IteratingSystem {
    			sprite.setRotation((float) (MathUtils.radiansToDegrees*theta));
    			sprite.setSize(20, 20);
    			sprite.setOriginCenter();
-   			//sprite.rotate((float) theta);
    			sprite.draw(batch);
-   			//batch.draw(texture, (float) (2*Math.cos(theta)), (float) (2*Math.sin(theta)), 15, 15);
    			batch.end();
    		}    
     }

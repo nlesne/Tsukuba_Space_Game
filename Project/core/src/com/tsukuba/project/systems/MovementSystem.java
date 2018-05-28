@@ -20,16 +20,19 @@ public class MovementSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent position = ComponentList.TRANSFORM.get(entity);
         MovementComponent movement = ComponentList.MOVEMENT.get(entity);
-        
         Vector2 tmp = new Vector2();
-
-        //accelX = (float) -(0.1*Math.cos(Math.toDegrees(rotation)+Math.PI/2));
-        //accelY = (float) -(0.1*Math.sin(Math.toDegrees(rotation)+Math.PI/2));
-        
+                        
+        position.rotation = (float) (position.rotation%Math.toRadians(360));
+               
         tmp.set(movement.acceleration).scl(deltaTime);
         movement.velocity.add(tmp);
-        
+     
         tmp.set(movement.velocity).scl(deltaTime);
-        position.position.add(tmp.x,tmp.y,0.0f);      
+        movement.velocity.x*=0.99;
+        movement.velocity.y*=0.99;
+        position.position.add(tmp.x,tmp.y,0.0f);    
+        
+        movement.acceleration.x = 0;
+        movement.acceleration.y = 0;
     }
 }
