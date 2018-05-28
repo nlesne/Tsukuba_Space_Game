@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
@@ -21,22 +22,24 @@ public class GameScreen extends ScreenAdapter {
     private SpaceGame game;
     private PooledEngine engine;
     private OrthographicCamera camera;
+	private ShapeRenderer shape;
 
     private boolean camera_lock = true;
     
     public GameScreen(SpaceGame game) {
         this.game = game;
         engine = new PooledEngine();
-        
+        shape = new ShapeRenderer();
+
         //Player
         PlayerShipFactory.create(engine,16,16);
-        
+
         
         //Enemy
         EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
         EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
 
-        
+
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
         camera = engine.getSystem(RenderingSystem.class).getCamera();
@@ -49,21 +52,19 @@ public class GameScreen extends ScreenAdapter {
         engine.update(delta);        
 
         Entity playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
-        
+
         handleCamera(camera, playerEntity, delta);
-        handleInput(playerEntity);
+        handleInput(playerEntity,delta);
     }
    
     
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
-    	
     	if(camera_lock) {
     		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
     		camera.position.set(transform.position.x,transform.position.y,0);
     		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
     	}
-    	
-    	
+
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.zoom += 0.02;
 		}
@@ -95,25 +96,32 @@ public class GameScreen extends ScreenAdapter {
 		}
     }
     
-    private void handleInput(Entity playerEntity) {        
+    private void handleInput(Entity playerEntity, float delta) {
+
+    	MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
+        TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
 
         float accelX = 0.0f;
         float accelY = 0.0f;
+        float rotation = transform.rotation;
 
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-            accelX = -0.2f;
+        	rotation += 0.03f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-            accelX = 0.2f;
+        	rotation -= 0.03f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            accelY = 0.2f;
+            accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
+            accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-            accelY = -0.2f;
+        	accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
+        	accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
         }
 
-        MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
         movement.velocity.add(new Vector2(accelX,accelY));
+        transform.rotation=rotation;
+
     }
 }
