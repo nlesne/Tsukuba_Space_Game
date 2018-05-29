@@ -9,7 +9,9 @@ public class Assets {
     public static Texture ships;
     public static Texture enemies;
     public static Texture objects;
-
+    public static Texture planets;
+    
+    public static TextureRegion planet;
     public static TextureRegion playership;
     public static TextureRegion mineEnemy;
     public static TextureRegion shooterEnemy;
@@ -23,13 +25,13 @@ public class Assets {
         ships = loadTexture("ships.jpg");
         enemies = loadTexture("enemies.jpg");
         objects = loadTexture("arrow.png");
+        planets = loadTexture("planet1.png");
 
         playership = new TextureRegion(ships,0,0,32,32);
-
         mineEnemy = new TextureRegion(enemies,64,0,0,0);
         shooterEnemy = new TextureRegion(enemies, 128, 0, 32, 32);
         arrow = new TextureRegion(objects,0,0,objects.getWidth(),objects.getHeight());
-        
+        planet = new TextureRegion(planets,0,0,objects.getWidth(),objects.getHeight());
 
     }
 }
