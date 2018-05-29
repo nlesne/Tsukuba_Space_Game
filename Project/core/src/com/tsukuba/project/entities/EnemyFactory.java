@@ -22,6 +22,7 @@ public class EnemyFactory {
         transform.position.y = random.nextFloat() * 32;
         transform.scale.set(0.25f,0.25f);
         MovementComponent movement = engine.createComponent(MovementComponent.class);
+        movement.friction = 0.99f;
         AIComponent ai = engine.createComponent(AIComponent.class);
         ai.detectionRadius = 16;
         HealthComponent health = engine.createComponent(HealthComponent.class);

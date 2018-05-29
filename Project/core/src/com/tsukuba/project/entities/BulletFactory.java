@@ -4,10 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.math.MathUtils;
 import com.tsukuba.project.Assets;
-import com.tsukuba.project.components.ComponentList;
-import com.tsukuba.project.components.DrawableComponent;
-import com.tsukuba.project.components.MovementComponent;
-import com.tsukuba.project.components.TransformComponent;
+import com.tsukuba.project.components.*;
 
 public class BulletFactory {
     public static Entity shoot(PooledEngine engine, Entity player) {
@@ -27,9 +24,13 @@ public class BulletFactory {
         MovementComponent movement = engine.createComponent(MovementComponent.class);
         movement.velocity.set(bulletPosOffsetX*10f,bulletPosOffsetY*10f);
 
+        ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
+        projectile.contactDamage = 1;
+
         bullet.add(drawable);
         bullet.add(transform);
         bullet.add(movement);
+        bullet.add(projectile);
         engine.addEntity(bullet);
 
         return bullet;
