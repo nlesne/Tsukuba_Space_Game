@@ -11,7 +11,7 @@ import com.tsukuba.project.components.TransformComponent;
 import com.tsukuba.project.components.MovementComponent;
 
 public class MovementSystem extends IteratingSystem {
-	
+
     public MovementSystem() {
         super(Family.all(TransformComponent.class, MovementComponent.class).get());
 
@@ -21,18 +21,15 @@ public class MovementSystem extends IteratingSystem {
         TransformComponent position = ComponentList.TRANSFORM.get(entity);
         MovementComponent movement = ComponentList.MOVEMENT.get(entity);
         Vector2 tmp = new Vector2();
-                        
+
         position.rotation = (float) (position.rotation%Math.toRadians(360));
-               
+
         tmp.set(movement.acceleration).scl(deltaTime);
         movement.velocity.add(tmp);
-     
+        movement.velocity.scl(0.99f);
+
         tmp.set(movement.velocity).scl(deltaTime);
-        movement.velocity.x*=0.99;
-        movement.velocity.y*=0.99;
-        position.position.add(tmp.x,tmp.y,0.0f);    
-        
-        movement.acceleration.x = 0;
-        movement.acceleration.y = 0;
+        position.position.add(tmp.x,tmp.y,0.0f);
+
     }
 }

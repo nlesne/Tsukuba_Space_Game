@@ -1,7 +1,5 @@
 package com.tsukuba.project.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -11,11 +9,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.ComponentList;
-import com.tsukuba.project.components.EnnemyComponent;
+import com.tsukuba.project.components.EnemyTypeComponent;
 import com.tsukuba.project.components.PlayerComponent;
 import com.tsukuba.project.components.TransformComponent;
 
@@ -26,21 +23,18 @@ public class IndicatorSystem extends IteratingSystem {
 	private Texture texture;
 	private Sprite sprite;
 
-    public IndicatorSystem(OrthographicCamera camera) {
-        super(Family.all(EnnemyComponent.class).get());
+    public IndicatorSystem(OrthographicCamera camera,SpriteBatch batch) {
+        super(Family.all(EnemyTypeComponent.class).get());
         
         this.camera = camera;
-        texture = new Texture(Gdx.files.internal("arrow.png"));
-        sprite = new Sprite(texture);
-        batch = new SpriteBatch();
+        sprite = new Sprite(Assets.arrow);
+        this.batch = batch;
         sprite.flip(true, false);
     }
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        
-    	Family playerFamily = Family.all(PlayerComponent.class).get();
-        ImmutableArray<Entity> player = getEngine().getEntitiesFor(playerFamily);
-        Entity playerEntity = player.first();
+
+        Entity playerEntity = getEngine().getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
     	
         TransformComponent positionPlayer = ComponentList.TRANSFORM.get(playerEntity);
     	TransformComponent position = ComponentList.TRANSFORM.get(entity);
