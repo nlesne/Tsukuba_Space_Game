@@ -44,11 +44,11 @@ public class IndicatorSystem extends IteratingSystem {
    			//theta = theta*180/Math.PI;
    					
    			batch.begin();
-   			float spritePosX = (float) (300+150*Math.cos(theta));
-   			float spritePosY = (float) (220+150*Math.sin(theta));
+   			float spritePosX = (float) (positionPlayer.position.x +(4*Math.cos(theta)));
+   			float spritePosY = (float) (positionPlayer.position.y +(4*Math.sin(theta)));
    			sprite.setPosition(spritePosX,spritePosY);	
    			sprite.setRotation((float) (MathUtils.radiansToDegrees*theta));
-   			sprite.setSize(20, 20);
+   			sprite.setSize(1.5f, 1.5f);
    			sprite.setOriginCenter();
    			sprite.draw(batch);
    			batch.end();
