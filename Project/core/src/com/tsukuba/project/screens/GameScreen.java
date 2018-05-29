@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
+import com.tsukuba.project.entities.BulletFactory;
 import com.tsukuba.project.entities.EnemyFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
 import com.tsukuba.project.systems.AISystem;
@@ -96,6 +97,9 @@ public class GameScreen extends ScreenAdapter {
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 			camera_lock = true;
 		}
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            BulletFactory.shoot(engine,playerEntity);
+        }
     }
     
     private void handleInput(Entity playerEntity, float delta) {
