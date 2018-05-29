@@ -11,4 +11,5 @@ public class ComponentList {
     public static final ComponentMapper<AIComponent> AI = ComponentMapper.getFor(AIComponent.class);
     public static final ComponentMapper<CollidingComponent> COLLIDING = ComponentMapper.getFor(CollidingComponent.class);
     public static final ComponentMapper<EnemyTypeComponent> ENEMY_TYPE = ComponentMapper.getFor(EnemyTypeComponent.class);
+    public static final ComponentMapper<PlayerComponent> PLAYER = ComponentMapper.getFor(PlayerComponent.class);
 }

@@ -26,6 +26,7 @@ public class GameScreen extends ScreenAdapter {
     private PooledEngine engine;
     private OrthographicCamera camera;
 	private ShapeRenderer shape;
+	private float accumulator = 0f;
 
     private boolean camera_lock = true;
     
@@ -60,12 +61,14 @@ public class GameScreen extends ScreenAdapter {
 
         Entity playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
 
+        accumulator += delta;
         handleCamera(camera, playerEntity, delta);
         handleInput(playerEntity,delta);
     }
    
     
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
+        PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
     	if(camera_lock) {
     		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
     		camera.position.set(transform.position.x,transform.position.y,0);
@@ -102,7 +105,10 @@ public class GameScreen extends ScreenAdapter {
 			camera_lock = true;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            BulletFactory.shoot(engine,playerEntity);
+    	    if (accumulator >= playerComponent.shootCooldown) {
+                BulletFactory.shoot(engine,playerEntity);
+                accumulator = 0f;
+            }
         }
     }
     

@@ -7,10 +7,12 @@ import com.badlogic.gdx.utils.Pool;
 public class MovementComponent implements Component, Pool.Poolable {
     public Vector2 velocity = new Vector2();
     public Vector2 acceleration = new Vector2();
+    public float friction = 1;
 
     @Override
     public void reset() {
         velocity = new Vector2();
         acceleration = new Vector2();
+        friction = 1;
     }
 }

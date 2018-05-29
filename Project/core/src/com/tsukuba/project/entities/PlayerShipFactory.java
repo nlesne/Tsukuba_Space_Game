@@ -21,8 +21,7 @@ public class PlayerShipFactory {
         healthComponent.currentHealth = healthComponent.maxHealth;
 
         MovementComponent movementComponent = engine.createComponent(MovementComponent.class);
-        movementComponent.velocity.set(0f,0f);
-        movementComponent.acceleration.set(0,0);
+        movementComponent.friction = 0.99f;
 
         Entity player = engine.createEntity();
 

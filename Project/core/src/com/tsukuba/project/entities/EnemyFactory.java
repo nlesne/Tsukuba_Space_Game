@@ -23,7 +23,7 @@ public class EnemyFactory {
         transform.scale.set(0.25f,0.25f);
         MovementComponent movement = engine.createComponent(MovementComponent.class);
         AIComponent ai = engine.createComponent(AIComponent.class);
-        ai.detectionRadius = 32;
+        ai.detectionRadius = 16;
         HealthComponent health = engine.createComponent(HealthComponent.class);
         EnemyTypeComponent enemyType = engine.createComponent(EnemyTypeComponent.class);
         enemyType.type = type;

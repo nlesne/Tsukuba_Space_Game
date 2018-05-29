@@ -51,6 +51,7 @@ public class AISystem extends IteratingSystem {
                         double lerpedAngle = MathUtils.lerpAngle(transform.rotation, targetAngle, 1f);
 
                         movement.velocity.set((float) (5f*Math.cos(lerpedAngle)), (float) (5f*Math.sin(lerpedAngle)));
+                        transform.rotation = (float) (lerpedAngle - MathUtils.PI / 2);
                         break;
                     case SHOOTER:
                         //TODO
