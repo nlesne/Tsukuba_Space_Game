@@ -11,13 +11,14 @@ import com.tsukuba.project.components.MovementComponent;
 import com.tsukuba.project.components.TransformComponent;
 
 public class PlanetFactory {
-	public static Entity create(PooledEngine engine) {
+	public static Entity create(PooledEngine engine, float x, float y, float size) {
 		
-		DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
-		drawable.sprite = new TextureRegion(Assets.planet);
-		
+		DrawableComponent drawable = engine.createComponent(DrawableComponent.class);			
         TransformComponent transform = engine.createComponent(TransformComponent.class);
-
+        drawable.sprite = new TextureRegion(Assets.planet);
+        
+        transform.scale.set(size,size);
+        
         Entity planet = engine.createEntity();
         planet.add(drawable);
         planet.add(transform);

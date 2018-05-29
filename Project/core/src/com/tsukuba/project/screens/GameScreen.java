@@ -13,6 +13,7 @@ import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.BulletFactory;
 import com.tsukuba.project.entities.EnemyFactory;
+import com.tsukuba.project.entities.PlanetFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
 import com.tsukuba.project.systems.AISystem;
 import com.tsukuba.project.systems.IndicatorSystem;
@@ -42,6 +43,9 @@ public class GameScreen extends ScreenAdapter {
         EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
 
 
+        //Planet
+        PlanetFactory.create(engine,11,11,3);
+        
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
         engine.addSystem(new AISystem());
