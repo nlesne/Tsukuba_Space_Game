@@ -13,6 +13,7 @@ import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.EnemyFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
+import com.tsukuba.project.systems.AISystem;
 import com.tsukuba.project.systems.IndicatorSystem;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
@@ -42,6 +43,7 @@ public class GameScreen extends ScreenAdapter {
 
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
+        engine.addSystem(new AISystem());
         camera = engine.getSystem(RenderingSystem.class).getCamera();
         engine.addSystem(new IndicatorSystem(camera,game.batch));
         game.batch.setProjectionMatrix(camera.combined);
@@ -106,10 +108,10 @@ public class GameScreen extends ScreenAdapter {
         float rotation = transform.rotation;
 
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-        	rotation += 0.03f;
+        	rotation += 0.05f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-        	rotation -= 0.03f;
+        	rotation -= 0.05f;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
             accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
@@ -120,7 +122,7 @@ public class GameScreen extends ScreenAdapter {
         	accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
         }
 
-        movement.velocity.add(new Vector2(accelX,accelY));
+        movement.velocity.add(accelX,accelY);
         transform.rotation=rotation;
 
     }

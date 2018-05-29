@@ -35,6 +35,9 @@ public class AISystem extends IteratingSystem {
                             ai.target = player;
                         }
                         break;
+                    case SHOOTER:
+                        //TODO
+                        break;
                 }
                 break;
             case CHARGE:
@@ -45,11 +48,12 @@ public class AISystem extends IteratingSystem {
                         float targetY = targetTransform.position.y;
                         float targetAngle = MathUtils.atan2(targetY - transform.position.y, targetX - transform.position.x);
 
-                        double lerpedAngle = MathUtils.lerpAngle(transform.rotation, targetAngle, 0.5f);
+                        double lerpedAngle = MathUtils.lerpAngle(transform.rotation, targetAngle, 1f);
 
-                        movement.acceleration.set((float) Math.cos(lerpedAngle), (float) Math.sin(lerpedAngle));
+                        movement.acceleration.set((float) (10f*Math.cos(lerpedAngle)), (float) (10f*Math.sin(lerpedAngle)));
                         break;
                     case SHOOTER:
+                        //TODO
                         break;
                 }
                 break;
