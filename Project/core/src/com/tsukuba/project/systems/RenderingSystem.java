@@ -1,11 +1,9 @@
 package com.tsukuba.project.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -20,7 +18,7 @@ public class RenderingSystem extends SortedIteratingSystem{
 
     static final float GAME_WIDTH = 32;
     static final float GAME_HEIGHT = 32;
-    static final float PIXEL_METER_RATIO = 1.0f / 32.0f;
+    static final float PIXEL_PER_METER = 32.0f;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -59,15 +57,15 @@ public class RenderingSystem extends SortedIteratingSystem{
 
             TransformComponent etc = ComponentList.TRANSFORM.get(e);
 
-            float w = edc.sprite.getRegionWidth();
-            float h = edc.sprite.getRegionHeight();
+            float w = etc.width * PIXEL_PER_METER;
+            float h = etc.height * PIXEL_PER_METER;
             float x = w * 0.5f;
             float y = h * 0.5f;
 
             batch.draw(edc.sprite,
                     etc.position.x - x, etc.position.y - y,
                     x, y, w, h,
-                    etc.scale.x * PIXEL_METER_RATIO, etc.scale.y * PIXEL_METER_RATIO,
+                    etc.scale.x * (1/PIXEL_PER_METER), etc.scale.y * (1/PIXEL_PER_METER),
                     MathUtils.radiansToDegrees * etc.rotation);
         }
 

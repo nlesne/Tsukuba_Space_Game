@@ -7,24 +7,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.BulletFactory;
 import com.tsukuba.project.entities.EnemyFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
-import com.tsukuba.project.systems.AISystem;
-import com.tsukuba.project.systems.IndicatorSystem;
-import com.tsukuba.project.systems.MovementSystem;
-import com.tsukuba.project.systems.RenderingSystem;
+import com.tsukuba.project.systems.*;
 
 public class GameScreen extends ScreenAdapter {
 
     private SpaceGame game;
     private PooledEngine engine;
     private OrthographicCamera camera;
-	private ShapeRenderer shape;
 	private float accumulator = 0f;
 
     private boolean camera_lock = true;
@@ -32,22 +26,24 @@ public class GameScreen extends ScreenAdapter {
     public GameScreen(SpaceGame game) {
         this.game = game;
         engine = new PooledEngine();
-        shape = new ShapeRenderer();
 
         //Player
-        PlayerShipFactory.create(engine,16,16);
+        PlayerShipFactory.create(engine,0,0);
 
         
         //Enemy
-        EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
-        EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
+        EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+        //EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
 
 
         engine.addSystem(new MovementSystem());
         engine.addSystem(new RenderingSystem(game.batch));
         engine.addSystem(new AISystem());
+        engine.addSystem(new HitboxUpdateSystem(game.batch));
         camera = engine.getSystem(RenderingSystem.class).getCamera();
         engine.addSystem(new IndicatorSystem(camera,game.batch));
+        engine.addSystem(new CollisionDetectionSystem(engine));
+        engine.addSystem(new CollisionResolveSystem(engine));
         game.batch.setProjectionMatrix(camera.combined);
     }
 

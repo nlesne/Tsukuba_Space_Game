@@ -3,9 +3,6 @@ package com.tsukuba.project.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -22,7 +19,7 @@ public class IndicatorSystem extends IteratingSystem {
 	private Sprite sprite;
 
     public IndicatorSystem(OrthographicCamera camera,SpriteBatch batch) {
-        super(Family.all(EnemyTypeComponent.class).get());
+        super(Family.all(EnemyComponent.class).get());
         
         this.camera = camera;
         sprite = new Sprite(Assets.arrow);

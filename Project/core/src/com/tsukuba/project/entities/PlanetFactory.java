@@ -4,11 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.tsukuba.project.Assets;
-import com.tsukuba.project.components.AIComponent;
-import com.tsukuba.project.components.DrawableComponent;
-import com.tsukuba.project.components.HealthComponent;
-import com.tsukuba.project.components.MovementComponent;
-import com.tsukuba.project.components.TransformComponent;
+import com.tsukuba.project.components.*;
 
 public class PlanetFactory {
 	public static Entity create(PooledEngine engine) {
@@ -17,10 +13,13 @@ public class PlanetFactory {
 		drawable.sprite = new TextureRegion(Assets.planet);
 		
         TransformComponent transform = engine.createComponent(TransformComponent.class);
+        TypeComponent type = engine.createComponent(TypeComponent.class);
+        type.type = TypeComponent.EntityType.PLANET;
 
         Entity planet = engine.createEntity();
         planet.add(drawable);
         planet.add(transform);
+        planet.add(type);
 
         engine.addEntity(planet);
 		

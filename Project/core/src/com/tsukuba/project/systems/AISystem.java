@@ -10,14 +10,14 @@ public class AISystem extends IteratingSystem {
 
 
     public AISystem() {
-        super(Family.all(EnemyTypeComponent.class, AIComponent.class, MovementComponent.class, TransformComponent.class).get());
+        super(Family.all(EnemyComponent.class, AIComponent.class, MovementComponent.class, TransformComponent.class).get());
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent transform = ComponentList.TRANSFORM.get(entity);
         AIComponent ai = ComponentList.AI.get(entity);
-        EnemyTypeComponent.EnemyType enemyType = ComponentList.ENEMY_TYPE.get(entity).type;
+        EnemyComponent.EnemyType enemyType = ComponentList.ENEMY.get(entity).type;
         MovementComponent movement = ComponentList.MOVEMENT.get(entity);
 
         Entity player = getEngine().getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
@@ -34,7 +34,10 @@ public class AISystem extends IteratingSystem {
                         }
                         break;
                     case SHOOTER:
-                        //TODO
+                        if (distToPlayer <= ai.detectionRadius) {
+                            ai.state = AIComponent.AIState.AIM;
+                            ai.target = player;
+                        }
                         break;
                 }
                 break;
@@ -53,13 +56,12 @@ public class AISystem extends IteratingSystem {
                         transform.rotation = (float) (lerpedAngle - MathUtils.PI / 2);
                         break;
                     case SHOOTER:
-                        //TODO
                         break;
                 }
                 break;
             case AIM:
-                if (enemyType == EnemyTypeComponent.EnemyType.SHOOTER) {
-                    //TODO
+                if (enemyType == EnemyComponent.EnemyType.SHOOTER) {
+                    TransformComponent targetTransform = ComponentList.TRANSFORM.get(ai.target);
                 }
                 break;
             case FLEE:
