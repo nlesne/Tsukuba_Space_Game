@@ -7,14 +7,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.BulletFactory;
 import com.tsukuba.project.entities.EnemyFactory;
+import com.tsukuba.project.entities.PlanetFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
 import com.tsukuba.project.systems.*;
 
+import java.util.Random;
+
 public class GameScreen extends ScreenAdapter {
+
+	private int MAX_PLANET = 200;
+
+//	private OrthographicCamera cameraMiniMap;
+//	private SpriteBatch batchMiniMap;
 
     private SpaceGame game;
     private PooledEngine engine;
@@ -27,8 +36,10 @@ public class GameScreen extends ScreenAdapter {
         this.game = game;
         engine = new PooledEngine();
 
+        generatePlanets();
+
         //Player
-        PlayerShipFactory.create(engine,0,0);
+        PlayerShipFactory.create(engine,16,16);
 
         
         //Enemy
@@ -45,11 +56,17 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new CollisionDetectionSystem(engine));
         engine.addSystem(new CollisionResolveSystem(engine));
         game.batch.setProjectionMatrix(camera.combined);
+
+//        cameraMiniMap = new OrthographicCamera(800,480);
+//        cameraMiniMap.zoom = 4;
+//        batchMiniMap = new SpriteBatch();
     }
 
     @Override
     public void render(float delta) {
         engine.update(delta);        
+        //cameraMiniMap.update();
+        //batchMiniMap.setProjectionMatrix(cameraMiniMap.combined);
 
         Entity playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
 
@@ -58,13 +75,38 @@ public class GameScreen extends ScreenAdapter {
         handleInput(playerEntity,delta);
     }
    
-    
+    private void generatePlanets() {
+    	Random rand = new Random();
+
+        //Planet
+        for(int i = 0; i < MAX_PLANET; i++) {
+        	// P(0) = 0.7, P(1) = 0.2, P(2) = 0.05, P(3) = 0.049, P(4) = 0.001.
+        	int size = rand.nextInt(100)+1;
+        	if(size<=70)
+        		size = 0;
+        	if(size>70 && size<=90)
+        		size = 1;
+        	if(size>90 && size<=95)
+        		size = 2;
+        	if(size>95 && size<=99)
+        		size = 3;
+        	if(size>99)
+        		size = 4;
+        	PlanetFactory.create(engine,rand.nextInt(1001)-500,rand.nextInt(1001)-500,size,i);
+        }
+    }
+
+
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
-        PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
+
+    	PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
+    	TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+    	//DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
+
     	if(camera_lock) {
-    		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
-    		camera.position.set(transform.position.x,transform.position.y,0);
+      		camera.position.set(transform.position.x,transform.position.y,0);
     		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
+    		//System.out.println("X : " +  transform.position.x + " / Y : " + transform.position.y);
     	}
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
@@ -102,6 +144,11 @@ public class GameScreen extends ScreenAdapter {
                 accumulator = 0f;
             }
         }
+
+//	   	batchMiniMap.begin();
+//        batchMiniMap.draw(drawable.sprite, transform.position.x, transform.position.y);
+//        batchMiniMap.end();
+
     }
     
     private void handleInput(Entity playerEntity, float delta) {
@@ -128,7 +175,24 @@ public class GameScreen extends ScreenAdapter {
         	accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
         }
 
+        // Enter a planet
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+        	int id = 3;
+        	enterAPlanet(id);
+        }
+
         movement.velocity.add(accelX,accelY);
         transform.rotation=rotation;
+    }
+
+    private void enterAPlanet(int id) {
+    	switch(id) {
+    	case 3 :
+    		game.setScreen(new PlanetHangarScreen(game, this));
+    		break;
+    	case 4 :
+    		//Change the screen
+    		break;
+    	}
     }
 }
