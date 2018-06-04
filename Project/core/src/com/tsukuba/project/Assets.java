@@ -13,6 +13,17 @@ public class Assets {
     public static Texture planet;
     public static Texture planetHangar;
     public static Texture asteroid;
+    public static Texture hangarBackground;
+    public static Texture engineer;
+    public static Texture pilot;
+    public static Texture hud_fullH;
+    public static Texture hud_halfH;
+    public static Texture hud_emptyH;
+    public static Texture hud_core;
+    public static Texture hud_rocket;
+    public static Texture hud_turret;
+    public static Texture hud_rocket2;
+   
     
     public static TextureRegion playerBullet;
 
@@ -21,6 +32,16 @@ public class Assets {
     }
 
     public static void load() {
+    	hud_core = loadTexture("spaceship_core.png");
+    	hud_rocket = loadTexture("spaceship_rocket.png");
+    	hud_rocket2 = loadTexture("spaceship_upgrade/spaceship_rocket2.png");
+    	hud_turret = loadTexture("spaceship_turret.png");
+    	hud_fullH = loadTexture("fullHeart.png");
+    	hud_halfH = loadTexture("halfHeart.png");
+    	hud_emptyH = loadTexture("emptyHeart.png");
+    	pilot = loadTexture("pilot.png");
+    	engineer = loadTexture("engineer.png");
+    	hangarBackground = loadTexture("hangarBackground.jpg");
     	asteroid = loadTexture("asteroid.png");
     	planet = loadTexture("planet1.png");
     	planetHangar = loadTexture("planet.png");

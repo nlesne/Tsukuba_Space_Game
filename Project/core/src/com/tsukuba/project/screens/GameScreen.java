@@ -9,8 +9,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
+import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.BulletFactory;
@@ -18,9 +30,11 @@ import com.tsukuba.project.entities.EnemyFactory;
 import com.tsukuba.project.entities.PlanetFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
 import com.tsukuba.project.systems.AISystem;
+import com.tsukuba.project.systems.HUDSystem;
 import com.tsukuba.project.systems.IndicatorSystem;
 import com.tsukuba.project.systems.MovementSystem;
 import com.tsukuba.project.systems.RenderingSystem;
+import com.tsukuba.project.systems.StarfieldParallaxSystem;
 
 public class GameScreen extends ScreenAdapter {
 
@@ -34,20 +48,29 @@ public class GameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
 	private ShapeRenderer shape;
 	private float accumulator = 0f;
-
+	
+	private OrthographicCamera hudCamera;
+	private SpriteBatch hud;
+	
+	private OrthographicCamera starfieldCamera;
+	private SpriteBatch starfield;
+	private Array<Vector3> starArray;
+	
     private boolean camera_lock = true;
     
     public GameScreen(SpaceGame game) {
         this.game = game;
         engine = new PooledEngine();
         shape = new ShapeRenderer();
-           
+        
+        starfield = new SpriteBatch(); 
+        hud = new SpriteBatch();
+        
         generatePlanets();
         
         //Player
         PlayerShipFactory.create(engine,16,16);
 
-        
         //Enemy
         EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
         EnemyFactory.spawn(engine,EnemyTypeComponent.EnemyType.MINE);
@@ -57,7 +80,15 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new AISystem());
         camera = engine.getSystem(RenderingSystem.class).getCamera();
         engine.addSystem(new IndicatorSystem(camera,game.batch));
+        engine.addSystem(new StarfieldParallaxSystem(shape));
+        engine.addSystem(new HUDSystem(hud));
         game.batch.setProjectionMatrix(camera.combined);
+        
+        starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
+        starfield.setProjectionMatrix(starfieldCamera.combined);
+        
+        hudCamera = engine.getSystem(RenderingSystem.class).getCamera();
+        hud.setProjectionMatrix(hudCamera.combined);
         
 //        cameraMiniMap = new OrthographicCamera(800,480);
 //        cameraMiniMap.zoom = 4;
@@ -97,10 +128,8 @@ public class GameScreen extends ScreenAdapter {
         	PlanetFactory.create(engine,rand.nextInt(1001)-500,rand.nextInt(1001)-500,size,i);
         }
     }
-    
-    
+   
     private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
-       
     	PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
     	TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
     	//DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
@@ -112,10 +141,10 @@ public class GameScreen extends ScreenAdapter {
     	}
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.zoom += 0.02;
+			//camera.zoom += 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			camera.zoom -= 0.02;
+			//camera.zoom -= 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
 			camera.translate(-1, 0, 0);
@@ -178,7 +207,7 @@ public class GameScreen extends ScreenAdapter {
         }
 
         // Enter a planet
-        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
         	int id = 3;
         	enterAPlanet(id);
         }
@@ -188,9 +217,10 @@ public class GameScreen extends ScreenAdapter {
     }
     
     private void enterAPlanet(int id) {
+    	//Not every hangar are the same in function of their ID
     	switch(id) {
     	case 3 :
-    		game.setScreen(new PlanetHangarScreen(game, this)); 
+    		game.setScreen(new PlanetHangarScreen(game, this, engine)); 
     		break;
     	case 4 :
     		//Change the screen

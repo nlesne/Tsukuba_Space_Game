@@ -13,4 +13,5 @@ public class ComponentList {
     public static final ComponentMapper<EnemyTypeComponent> ENEMY_TYPE = ComponentMapper.getFor(EnemyTypeComponent.class);
     public static final ComponentMapper<PlayerComponent> PLAYER = ComponentMapper.getFor(PlayerComponent.class);
     public static final ComponentMapper<ProjectileComponent> PROJECTILE = ComponentMapper.getFor(ProjectileComponent.class);
+    public static final ComponentMapper<UpgradeComponent> UPGRADE = ComponentMapper.getFor(UpgradeComponent.class);
 }

@@ -17,14 +17,18 @@ public class PlayerShipFactory {
         transformComponent.position.set(x,y,0);
         transformComponent.scale.set(0.1f,0.1f);
         HealthComponent healthComponent = engine.createComponent(HealthComponent.class);
-        healthComponent.maxHealth = 3;
+        healthComponent.maxHealth = 5;
         healthComponent.currentHealth = healthComponent.maxHealth;
 
         MovementComponent movementComponent = engine.createComponent(MovementComponent.class);
         movementComponent.friction = 0.99f;
+        
+        UpgradeComponent upgradeComponent = engine.createComponent(UpgradeComponent.class);
+        
 
         Entity player = engine.createEntity();
 
+        player.add(upgradeComponent);
         player.add(transformComponent);
         player.add(playerComponent);
         player.add(drawableComponent);

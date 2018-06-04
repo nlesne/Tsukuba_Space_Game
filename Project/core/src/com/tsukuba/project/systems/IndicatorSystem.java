@@ -18,7 +18,6 @@ public class IndicatorSystem extends IteratingSystem {
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
-	private Texture texture;
 	private Sprite sprite;
 
     public IndicatorSystem(OrthographicCamera camera,SpriteBatch batch) {
