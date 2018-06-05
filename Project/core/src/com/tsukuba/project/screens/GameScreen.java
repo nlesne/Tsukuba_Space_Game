@@ -17,10 +17,7 @@ import com.tsukuba.project.entities.BulletFactory;
 import com.tsukuba.project.entities.EnemyFactory;
 import com.tsukuba.project.entities.PlanetFactory;
 import com.tsukuba.project.entities.PlayerShipFactory;
-import com.tsukuba.project.systems.AISystem;
-import com.tsukuba.project.systems.IndicatorSystem;
-import com.tsukuba.project.systems.MovementSystem;
-import com.tsukuba.project.systems.RenderingSystem;
+import com.tsukuba.project.systems.*;
 
 import java.util.Random;
 
@@ -33,6 +30,7 @@ public class GameScreen extends ScreenAdapter {
 	
     private SpaceGame game;
     private PooledEngine engine;
+    private ShapeRenderer shape;
     private OrthographicCamera camera;
 	private float accumulator = 0f;
 
@@ -71,6 +69,7 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new IndicatorSystem(camera,game.batch));
         engine.addSystem(new CollisionDetectionSystem(engine));
         engine.addSystem(new CollisionResolveSystem(engine));
+        engine.addSystem(new StarfieldParallaxSystem(shape));
         game.batch.setProjectionMatrix(camera.combined);
 
         starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
@@ -132,10 +131,10 @@ public class GameScreen extends ScreenAdapter {
     	}
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			//camera.zoom += 0.02;
+			camera.zoom += 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			//camera.zoom -= 0.02;
+			camera.zoom -= 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
 			camera.translate(-1, 0, 0);
