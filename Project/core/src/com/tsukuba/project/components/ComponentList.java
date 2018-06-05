@@ -13,6 +13,7 @@ public class ComponentList {
     public static final ComponentMapper<EnemyComponent> ENEMY = ComponentMapper.getFor(EnemyComponent.class);
     public static final ComponentMapper<PlayerComponent> PLAYER = ComponentMapper.getFor(PlayerComponent.class);
     public static final ComponentMapper<ProjectileComponent> PROJECTILE = ComponentMapper.getFor(ProjectileComponent.class);
+    public static final ComponentMapper<UpgradeComponent> UPGRADE = ComponentMapper.getFor(UpgradeComponent.class);
     public static final ComponentMapper<TypeComponent> TYPE = ComponentMapper.getFor(TypeComponent.class);
     public static final ComponentMapper<HitboxComponent> HITBOX = ComponentMapper.getFor(HitboxComponent.class);
     public static final ComponentMapper<CooldownComponent> COOLDOWN = ComponentMapper.getFor(CooldownComponent.class);
