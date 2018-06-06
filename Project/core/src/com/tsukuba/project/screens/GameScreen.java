@@ -39,7 +39,6 @@ public class GameScreen extends ScreenAdapter {
 
 	private OrthographicCamera starfieldCamera;
 	private SpriteBatch starfield;
-	private Array<Vector3> starArray;
 
     private boolean camera_lock = true;
     
@@ -70,6 +69,7 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new CollisionDetectionSystem(engine));
         engine.addSystem(new CollisionResolveSystem(engine));
         engine.addSystem(new StarfieldParallaxSystem(shape));
+        engine.addSystem(new HUDSystem(hud));
         game.batch.setProjectionMatrix(camera.combined);
 
         starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
@@ -95,6 +95,8 @@ public class GameScreen extends ScreenAdapter {
         handleCamera(camera, playerEntity, delta);
         handleInput(playerEntity,delta);
     }
+
+
    
     private void generatePlanets() {
     	Random rand = new Random();

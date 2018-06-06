@@ -66,6 +66,14 @@ public class CollisionResolveSystem extends IteratingSystem {
                             getEngine().removeEntity(collidingEntity);
                             if (enemyHealth.currentHealth <= 0) {
                                 getEngine().removeEntity(entity);
+                                Entity player = getEngine().getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+                                if (projectile.shooter == player && ComponentList.QUEST.has(player)) {
+                                    QuestComponent quest = ComponentList.QUEST.get(player);
+                                    if (quest.type == QuestComponent.QuestType.KILL && quest.progress <= quest.objective) {
+                                        quest.progress++;
+                                        System.out.println(quest.progress);
+                                    }
+                                }
                             }
                         }
                         break;
