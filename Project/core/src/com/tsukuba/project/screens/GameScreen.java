@@ -131,7 +131,6 @@ public class GameScreen extends ScreenAdapter {
 
 		PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
 		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
-		DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
 
 		if(camera_lock) {
 			camera.position.set(transform.position.x,transform.position.y,0);
@@ -174,17 +173,15 @@ public class GameScreen extends ScreenAdapter {
 				accumulator = 0f;
 			}
 		}
-
-		//	   	batchMiniMap.begin();
-		//        batchMiniMap.draw(drawable.sprite, transform.position.x, transform.position.y);
-		//        batchMiniMap.end();
-
 	}
 
 	private void handleInput(Entity playerEntity, float delta) {
 
 		MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
 		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+		DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
+		
+		drawable.sprite = new Sprite(Assets.spaceship);
 
 		float accelX = 0.0f;
 		float accelY = 0.0f;
@@ -197,6 +194,7 @@ public class GameScreen extends ScreenAdapter {
 			rotation -= 0.05f;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
+			drawable.sprite = new Sprite(Assets.spaceship_firing);
 			accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
 			accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
 		}
@@ -204,16 +202,16 @@ public class GameScreen extends ScreenAdapter {
 			accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
 			accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
 		}
-    	if(Gdx.input.isKeyPressed(Input.Keys.F2) && cooldown<0) {
-    		if(toggleDebug) {
-    			engine.getSystem(DebugSystem.class).setProcessing(true);
-    			toggleDebug = false;
-    		} else {
-    			engine.getSystem(DebugSystem.class).setProcessing(false);
-    			toggleDebug = true;
-    		}
-    		cooldown = 25;
-    	}
+		if(Gdx.input.isKeyPressed(Input.Keys.F2) && cooldown<0) {
+			if(toggleDebug) {
+				engine.getSystem(DebugSystem.class).setProcessing(true);
+				toggleDebug = false;
+			} else {
+				engine.getSystem(DebugSystem.class).setProcessing(false);
+				toggleDebug = true;
+			}
+			cooldown = 25;
+		}
 		movement.velocity.add(accelX,accelY);
 		transform.rotation=rotation;
 	}

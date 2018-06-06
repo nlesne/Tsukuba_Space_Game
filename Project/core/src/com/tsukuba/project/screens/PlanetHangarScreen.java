@@ -1,5 +1,8 @@
 package com.tsukuba.project.screens;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,8 +13,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Timer;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
+import com.tsukuba.project.components.ComponentList;
+import com.tsukuba.project.components.EnemyComponent;
+import com.tsukuba.project.components.PlayerComponent;
+import com.tsukuba.project.components.QuestComponent;
+import com.tsukuba.project.entities.EnemyFactory;
+
+import java.util.Random;
 
 public class PlanetHangarScreen extends ScreenAdapter{
 	private PooledEngine engine;
@@ -66,10 +77,10 @@ public class PlanetHangarScreen extends ScreenAdapter{
 	@Override
 	public void show() {
 		//Buttons
-		TextButton quest = new TextButton("Quest", skin);
-		quest.setWidth(100f);
-		quest.setHeight(30f);
-		quest.setPosition(Gdx.graphics.getWidth() /2 - 200f, 75f);
+		TextButton questBtn = new TextButton("Quest", skin);
+		questBtn.setWidth(100f);
+		questBtn.setHeight(30f);
+		questBtn.setPosition(Gdx.graphics.getWidth() /2 - 200f, 75f);
 		TextButton exit = new TextButton("Exit", skin);
 		exit.setWidth(100f);
 		exit.setHeight(40f);
@@ -80,10 +91,50 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		upgrade.setPosition(Gdx.graphics.getWidth() /2 + 100f, 75f);
 
 		//Listeners
-		quest.addListener(new ChangeListener() {
+		questBtn.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				// Activate a random quest
+				Entity player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+				if (!ComponentList.QUEST.has(player)) {
+					final QuestComponent quest = engine.createComponent(QuestComponent.class);
+					Random random = new Random();
+					quest.progress = 0;
+					if (random.nextInt() > 0.5) {
+						quest.type = QuestComponent.QuestType.KILL;
+						quest.objective = 2 + random.nextInt(3);
+						quest.reward = quest.objective * 10;
+						for (int i = 0; i < quest.objective; i++) {
+							EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
+						}
+					}
+					else {
+						quest.type = QuestComponent.QuestType.SURVIVE;
+						quest.objective = 120;
+						quest.reward = 50;
+						Timer.schedule(new Timer.Task() {
+							@Override
+							public void run() {
+								quest.progress++;
+							}
+						},1,1,quest.objective);
+
+						Timer.schedule(new Timer.Task() {
+							@Override
+							public void run() {
+								EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+							}
+						},0,10,quest.objective/10);
+					}
+					player.add(quest);
+				}
+				else {
+					QuestComponent quest = ComponentList.QUEST.get(player);
+					if (quest.progress >= quest.objective) {
+						player.remove(QuestComponent.class);
+						PlayerComponent playerComponent = ComponentList.PLAYER.get(player);
+						playerComponent.money += quest.reward;
+					}
+				}
 			}
 		});
 		upgrade.addListener(new ChangeListener() {
@@ -113,7 +164,7 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		stage.addActor(engineer);
 		
 		//Buttons
-		stage.addActor(quest);
+		stage.addActor(questBtn);
 		stage.addActor(upgrade);
 		stage.addActor(exit);
 

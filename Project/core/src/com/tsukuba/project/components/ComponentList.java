@@ -17,5 +17,6 @@ public class ComponentList {
     public static final ComponentMapper<TypeComponent> TYPE = ComponentMapper.getFor(TypeComponent.class);
     public static final ComponentMapper<HitboxComponent> HITBOX = ComponentMapper.getFor(HitboxComponent.class);
     public static final ComponentMapper<CooldownComponent> COOLDOWN = ComponentMapper.getFor(CooldownComponent.class);
+    public static final ComponentMapper<QuestComponent> QUEST = ComponentMapper.getFor(QuestComponent.class);
 
 }
