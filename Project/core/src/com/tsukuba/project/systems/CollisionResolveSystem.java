@@ -4,16 +4,25 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
+import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
+import com.tsukuba.project.screens.PlanetHangarScreen;
 
 import static com.tsukuba.project.components.TypeComponent.EntityType;
 
 public class CollisionResolveSystem extends IteratingSystem {
     PooledEngine engine;
-
-    public CollisionResolveSystem(PooledEngine engine) {
+    SpaceGame game;
+    ScreenAdapter parent;
+    
+    public CollisionResolveSystem(PooledEngine engine, SpaceGame game, ScreenAdapter parent) {
         super(Family.all(CollidingComponent.class,TransformComponent.class).get());
         this.engine = engine;
+        this.game = game;
+        this.parent = parent;
     }
 
     @Override
@@ -51,7 +60,10 @@ public class CollisionResolveSystem extends IteratingSystem {
                         }
                         break;
                     case PLANET:
-                        //TODO
+                    	if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+                        	int id = 3;
+                        	enterAPlanet(id);
+                        }
                         break;
 
                 }
@@ -75,5 +87,17 @@ public class CollisionResolveSystem extends IteratingSystem {
 
         entity.remove(CollidingComponent.class);
 
+    }
+    
+    private void enterAPlanet(int id) {
+    	//Not every hangar are the same in function of their ID
+    	switch(id) {
+    	case 3 :
+    		game.setScreen(new PlanetHangarScreen(game, parent, engine));
+    		break;
+    	case 4 :
+    		//Change the screen
+    		break;
+    	}
     }
 }

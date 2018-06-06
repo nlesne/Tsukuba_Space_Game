@@ -7,10 +7,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.BulletFactory;
@@ -24,14 +26,14 @@ import java.util.Random;
 public class GameScreen extends ScreenAdapter {
 
 	private int MAX_PLANET = 200;
-	
-//	private OrthographicCamera cameraMiniMap;
-//	private SpriteBatch batchMiniMap;
-	
-    private SpaceGame game;
-    private PooledEngine engine;
-    private ShapeRenderer shape;
-    private OrthographicCamera camera;
+
+	//	private OrthographicCamera cameraMiniMap;
+	//	private SpriteBatch batchMiniMap;
+
+	private SpaceGame game;
+	private PooledEngine engine;
+	private ShapeRenderer shape;
+	private OrthographicCamera camera;
 	private float accumulator = 0f;
 
 	private OrthographicCamera hudCamera;
@@ -39,98 +41,105 @@ public class GameScreen extends ScreenAdapter {
 
 	private OrthographicCamera starfieldCamera;
 	private SpriteBatch starfield;
-	private Array<Vector3> starArray;
 
-    private boolean camera_lock = true;
-    
-    public GameScreen(SpaceGame game) {
-        this.game = game;
-        engine = new PooledEngine();
-        shape = new ShapeRenderer();
+	private boolean camera_lock = true;
+	private int cooldown;
+	private boolean toggleDebug;
 
-        starfield = new SpriteBatch();
-        hud = new SpriteBatch();
+	public GameScreen(SpaceGame game) {
+		this.game = game;
+		engine = new PooledEngine();
+		shape = new ShapeRenderer();
 
-        generatePlanets();
-        
-        //Player
-        PlayerShipFactory.create(engine,16,16);
+		starfield = new SpriteBatch();
+		hud = new SpriteBatch();
 
-        //Enemy
-        EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
-        //EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+		generatePlanets();
 
+		//Player
+		PlayerShipFactory.create(engine,16,16);
 
-        engine.addSystem(new MovementSystem());
-        engine.addSystem(new RenderingSystem(game.batch));
-        engine.addSystem(new AISystem());
-        engine.addSystem(new HitboxUpdateSystem(game.batch));
-        camera = engine.getSystem(RenderingSystem.class).getCamera();
-        engine.addSystem(new IndicatorSystem(camera,game.batch));
-        engine.addSystem(new CollisionDetectionSystem(engine));
-        engine.addSystem(new CollisionResolveSystem(engine));
-        engine.addSystem(new StarfieldParallaxSystem(shape));
-        game.batch.setProjectionMatrix(camera.combined);
-
-        starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
-        starfield.setProjectionMatrix(starfieldCamera.combined);
-
-        hudCamera = engine.getSystem(RenderingSystem.class).getCamera();
-        hud.setProjectionMatrix(hudCamera.combined);
-
-//        cameraMiniMap = new OrthographicCamera(800,480);
-//        cameraMiniMap.zoom = 4;
-//        batchMiniMap = new SpriteBatch();
-    }
-
-    @Override
-    public void render(float delta) {
-        engine.update(delta);        
-        //cameraMiniMap.update();
-        //batchMiniMap.setProjectionMatrix(cameraMiniMap.combined);
-        
-        Entity playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
-
-        accumulator += delta;
-        handleCamera(camera, playerEntity, delta);
-        handleInput(playerEntity,delta);
-    }
-   
-    private void generatePlanets() {
-    	Random rand = new Random();
-        
-        //Planet
-        for(int i = 0; i < MAX_PLANET; i++) {  
-        	// P(0) = 0.7, P(1) = 0.2, P(2) = 0.05, P(3) = 0.049, P(4) = 0.001.
-        	int size = rand.nextInt(100)+1;
-        	if(size<=70)
-        		size = 0;
-        	if(size>70 && size<=90)
-        		size = 1;
-        	if(size>90 && size<=95)
-        		size = 2;
-        	if(size>95 && size<=99)
-        		size = 3;
-        	if(size>99)
-        		size = 4;
-        	PlanetFactory.create(engine,rand.nextInt(1001)-500,rand.nextInt(1001)-500,size,i);
-        }
-    }
+		//Enemy
+		EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+		//EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
 
 
-    private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
+		engine.addSystem(new MovementSystem());
+		engine.addSystem(new RenderingSystem(game.batch));
+		engine.addSystem(new AISystem());
+		engine.addSystem(new HitboxUpdateSystem(game.batch));
+		camera = engine.getSystem(RenderingSystem.class).getCamera();
+		engine.addSystem(new HUDSystem(hud));
+		engine.addSystem(new DebugSystem(game.batch));
+		engine.addSystem(new StarfieldParallaxSystem(shape));
+		engine.addSystem(new IndicatorSystem(camera,game.batch));
+		engine.addSystem(new CollisionDetectionSystem(engine));
+		engine.addSystem(new CollisionResolveSystem(engine,game, this));
+		game.batch.setProjectionMatrix(camera.combined);
 
-    	PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
-    	TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
-    	//DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
-    	
-    	if(camera_lock) {
-      		camera.position.set(transform.position.x,transform.position.y,0);
-    		//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
-    		//System.out.println("X : " +  transform.position.x + " / Y : " + transform.position.y);
-    	}
+		starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
+		starfield.setProjectionMatrix(starfieldCamera.combined);
 
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+		hudCamera = engine.getSystem(RenderingSystem.class).getCamera();
+		hud.setProjectionMatrix(hudCamera.combined);
+
+		//        cameraMiniMap = new OrthographicCamera(800,480);
+		//        cameraMiniMap.zoom = 4;
+		//        batchMiniMap = new SpriteBatch();
+
+		cooldown = 10;
+		toggleDebug = false;
+	}
+
+	@Override
+	public void render(float delta) {
+		engine.update(delta);        
+		//cameraMiniMap.update();
+		//batchMiniMap.setProjectionMatrix(cameraMiniMap.combined);
+
+		Entity playerEntity = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+
+		accumulator += delta;
+		handleCamera(camera, playerEntity, delta);
+		handleInput(playerEntity,delta);
+		cooldown-=1;
+	}
+
+	private void generatePlanets() {
+		Random rand = new Random();
+
+		//Planet
+		for(int i = 0; i < MAX_PLANET; i++) {  
+			// P(0) = 0.7, P(1) = 0.2, P(2) = 0.05, P(3) = 0.049, P(4) = 0.001.
+			int size = rand.nextInt(100)+1;
+			if(size<=70)
+				size = 0;
+			if(size>70 && size<=90)
+				size = 1;
+			if(size>90 && size<=95)
+				size = 2;
+			if(size>95 && size<=99)
+				size = 3;
+			if(size>99)
+				size = 4;
+			PlanetFactory.create(engine,rand.nextInt(1001)-500,rand.nextInt(1001)-500,size,i);
+		}
+	}
+
+
+	private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
+
+		PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
+		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+		DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
+
+		if(camera_lock) {
+			camera.position.set(transform.position.x,transform.position.y,0);
+			//camera.position.add(camera.position.cpy().scl(-1).add(transform.position.x, transform.position.y, 0).scl(0.04f));
+			//System.out.println("X : " +  transform.position.x + " / Y : " + transform.position.y);
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.zoom += 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
@@ -160,61 +169,52 @@ public class GameScreen extends ScreenAdapter {
 			camera_lock = true;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-    	    if (accumulator >= playerComponent.shootCooldown) {
-                BulletFactory.shoot(engine,playerEntity);
-                accumulator = 0f;
-            }
-        }
-		
-//	   	batchMiniMap.begin();
-//        batchMiniMap.draw(drawable.sprite, transform.position.x, transform.position.y);
-//        batchMiniMap.end();
-		
-    }
-    
-    private void handleInput(Entity playerEntity, float delta) {
+			if (accumulator >= playerComponent.shootCooldown) {
+				BulletFactory.shoot(engine,playerEntity);
+				accumulator = 0f;
+			}
+		}
 
-    	MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
-        TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+		//	   	batchMiniMap.begin();
+		//        batchMiniMap.draw(drawable.sprite, transform.position.x, transform.position.y);
+		//        batchMiniMap.end();
 
-        float accelX = 0.0f;
-        float accelY = 0.0f;
-        float rotation = transform.rotation;
+	}
 
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-        	rotation += 0.05f;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-        	rotation -= 0.05f;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
-            accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
-            accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-        	accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
-        	accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
-        }
+	private void handleInput(Entity playerEntity, float delta) {
 
-        // Enter a planet
-        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
-        	int id = 3;
-        	enterAPlanet(id);
-        }
-        
-        movement.velocity.add(accelX,accelY);
-        transform.rotation=rotation;
-    }
-    
-    private void enterAPlanet(int id) {
-    	//Not every hangar are the same in function of their ID
-    	switch(id) {
-    	case 3 :
-    		game.setScreen(new PlanetHangarScreen(game, this, engine));
-    		break;
-    	case 4 :
-    		//Change the screen
-    		break;
+		MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
+		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+
+		float accelX = 0.0f;
+		float accelY = 0.0f;
+		float rotation = transform.rotation;
+
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
+			rotation += 0.05f;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
+			rotation -= 0.05f;
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
+			accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
+			accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
+			accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
+			accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
+		}
+    	if(Gdx.input.isKeyPressed(Input.Keys.F2) && cooldown<0) {
+    		if(toggleDebug) {
+    			engine.getSystem(DebugSystem.class).setProcessing(true);
+    			toggleDebug = false;
+    		} else {
+    			engine.getSystem(DebugSystem.class).setProcessing(false);
+    			toggleDebug = true;
+    		}
+    		cooldown = 25;
     	}
-    }
+		movement.velocity.add(accelX,accelY);
+		transform.rotation=rotation;
+	}
 }

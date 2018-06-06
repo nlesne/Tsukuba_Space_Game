@@ -26,7 +26,7 @@ public class BulletFactory {
         transform.height = 0.5f;
 
         MovementComponent movement = engine.createComponent(MovementComponent.class);
-        movement.velocity.set(bulletPosOffsetX*10f,bulletPosOffsetY*10f);
+        movement.velocity.set(bulletPosOffsetX*30f,bulletPosOffsetY*30f);
 
         ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
         projectile.damage = 1;

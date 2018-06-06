@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.*;
 
@@ -32,8 +33,8 @@ public class IndicatorSystem extends IteratingSystem {
     	
         TransformComponent positionPlayer = ComponentList.TRANSFORM.get(playerEntity);
     	TransformComponent position = ComponentList.TRANSFORM.get(entity);
-        		
-   		if(!camera.frustum.pointInFrustum(position.position)) {
+    	
+   		if(!camera.frustum.pointInFrustum(position.position) && positionPlayer.position.dst(position.position)<50) {
    			double theta = Math.atan2(position.position.y-positionPlayer.position.y,position.position.x-positionPlayer.position.x);
    			//theta = theta*180/Math.PI;
    					

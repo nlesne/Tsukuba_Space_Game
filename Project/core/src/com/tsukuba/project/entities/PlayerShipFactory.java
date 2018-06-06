@@ -12,7 +12,7 @@ public class PlayerShipFactory {
 
     public static Entity create(PooledEngine engine, float x, float y) {
         PlayerComponent playerComponent = engine.createComponent(PlayerComponent.class);
-        playerComponent.shootCooldown = 0;
+        playerComponent.shootCooldown = 0.25f;
         DrawableComponent drawableComponent = engine.createComponent(DrawableComponent.class);
         drawableComponent.sprite = new TextureRegion(Assets.spaceship);
 

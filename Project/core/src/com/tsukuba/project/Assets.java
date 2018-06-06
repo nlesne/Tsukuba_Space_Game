@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 public class Assets {
 
     public static Texture spaceship;
+    public static Texture spaceship_firing;
     public static Texture arrow;
     public static Texture enemy;
     public static Texture bullets;
@@ -45,7 +46,8 @@ public class Assets {
     	asteroid = loadTexture("asteroid.png");
     	planet = loadTexture("planet1.png");
     	planetHangar = loadTexture("planet.png");
-        spaceship = loadTexture("spaceship.png");
+    	spaceship_firing = loadTexture("spaceship_firing.png");
+    	spaceship = loadTexture("spaceship.png");
         enemy = loadTexture("enemy.png");
         arrow = loadTexture("arrow.png");
         bullets = loadTexture("bullets.png");

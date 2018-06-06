@@ -68,7 +68,7 @@ public class RenderingSystem extends SortedIteratingSystem{
                     etc.scale.x * (1/PIXEL_PER_METER), etc.scale.y * (1/PIXEL_PER_METER),
                     MathUtils.radiansToDegrees * etc.rotation);
         }
-
+        
         batch.end();
         renderQueue.clear();
     }
