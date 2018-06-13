@@ -12,13 +12,14 @@ public class PlayerShipFactory {
 
     public static Entity create(PooledEngine engine, float x, float y) {
         PlayerComponent playerComponent = engine.createComponent(PlayerComponent.class);
-        playerComponent.shootCooldown = 0.25f;
+        playerComponent.baseShootCooldown = 0.25f;
+        playerComponent.money = 100;
+
         DrawableComponent drawableComponent = engine.createComponent(DrawableComponent.class);
         drawableComponent.sprite = new TextureRegion(Assets.spaceship);
 
         TransformComponent transformComponent = engine.createComponent(TransformComponent.class);
         transformComponent.position.set(x,y,0);
-        //transformComponent.scale.set(0.1f,0.1f);
         transformComponent.height = 3;
         transformComponent.width = 2;
         HealthComponent healthComponent = engine.createComponent(HealthComponent.class);
@@ -29,14 +30,13 @@ public class PlayerShipFactory {
         movementComponent.friction = 0.99f;
         
         UpgradeComponent upgradeComponent = engine.createComponent(UpgradeComponent.class);
-        
 
         TypeComponent typeComponent = engine.createComponent(TypeComponent.class);
         typeComponent.type = TypeComponent.EntityType.PLAYER;
 
         HitboxComponent hitboxcomponent = engine.createComponent(HitboxComponent.class);
         hitboxcomponent.width = transformComponent.width;
-        hitboxcomponent.height = transformComponent.height;
+        hitboxcomponent.height = transformComponent.height-0.5f;
         hitboxcomponent.shape = new Polygon(new float[]
                 {
                         0,0,

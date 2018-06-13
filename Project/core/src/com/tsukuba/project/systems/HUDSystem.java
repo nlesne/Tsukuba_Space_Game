@@ -3,17 +3,12 @@ package com.tsukuba.project.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.*;
@@ -31,6 +26,7 @@ public class HUDSystem extends EntitySystem {
 
 	public HUDSystem(SpriteBatch batch) {
 
+		priority = 6;
 		shape = new ShapeRenderer();
 		font = new BitmapFont();
 
@@ -67,7 +63,7 @@ public class HUDSystem extends EntitySystem {
 			if(i>playerHealth.currentHealth) {
 				heart = new Sprite(Assets.hud_emptyH);
 			}
-			heart.setSize(1.5f, 2f);
+			heart.setSize(1f, 1f);
 			heart.setPosition(-4+i*1.5f,13f);	
 			heart.setOriginCenter();
 			heart.draw(batch);
@@ -139,7 +135,7 @@ public class HUDSystem extends EntitySystem {
 		}
 
 		//Rocket Upgrade
-		switch(playerUpgrade.rocketLevel) {
+		switch(playerUpgrade.thrustersLevel) {
 		case 1 :
 			rocket = new Sprite(Assets.hud_rocket);
 			break;
@@ -152,7 +148,7 @@ public class HUDSystem extends EntitySystem {
 		}
 
 		//Turret Upgrade
-		switch(playerUpgrade.turretLevel) {
+		switch(playerUpgrade.weaponLevel) {
 		case 1 :
 			break;
 		case 2:

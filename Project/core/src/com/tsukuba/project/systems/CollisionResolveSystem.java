@@ -1,14 +1,16 @@
 package com.tsukuba.project.systems;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.ScreenAdapter;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
+import com.tsukuba.project.screens.GameScreen;
 import com.tsukuba.project.screens.PlanetHangarScreen;
 
 import static com.tsukuba.project.components.TypeComponent.EntityType;
@@ -16,25 +18,26 @@ import static com.tsukuba.project.components.TypeComponent.EntityType;
 public class CollisionResolveSystem extends IteratingSystem {
     PooledEngine engine;
     SpaceGame game;
-    ScreenAdapter parent;
-    
-    public CollisionResolveSystem(PooledEngine engine, SpaceGame game, ScreenAdapter parent) {
-        super(Family.all(CollidingComponent.class,TransformComponent.class).get());
+    GameScreen screen;
+
+    public CollisionResolveSystem(PooledEngine engine, SpaceGame game, GameScreen screen) {
+        super(Family.all(CollidingComponent.class,TransformComponent.class).get(),3);
         this.engine = engine;
         this.game = game;
-        this.parent = parent;
+        this.screen = screen;
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         CollidingComponent collidingComponent = ComponentList.COLLIDING.get(entity);
         Entity collidingEntity = collidingComponent.collidingEntity;
+
+        if (entity.isScheduledForRemoval() || collidingEntity.isScheduledForRemoval() || entity.getComponents().size() == 0 || collidingEntity.getComponents().size() == 0)
+            return;
+
         HealthComponent health = ComponentList.HEALTH.get(entity);
         EntityType e1Type = ComponentList.TYPE.get(entity).type;
         EntityType e2Type = ComponentList.TYPE.get(collidingEntity).type;
-
-        if (entity.isScheduledForRemoval() || collidingEntity.isScheduledForRemoval())
-            return;
 
         switch (e1Type) {
             case PLAYER:
@@ -43,7 +46,7 @@ public class CollisionResolveSystem extends IteratingSystem {
                         ProjectileComponent projectile = ComponentList.PROJECTILE.get(collidingEntity);
                         if (!projectile.shooter.equals(entity)) {
                             health.currentHealth -= projectile.damage;
-                            getEngine().removeEntity(collidingEntity);
+                            engine.removeEntity(collidingEntity);
                         }
                         break;
                     case ENEMY:
@@ -60,30 +63,43 @@ public class CollisionResolveSystem extends IteratingSystem {
                         }
                         break;
                     case PLANET:
-                    	if (Gdx.input.isKeyPressed(Input.Keys.X)) {
-                        	int id = 3;
-                        	enterAPlanet(id);
+                        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+                            game.setScreen(new PlanetHangarScreen(game, screen, engine,collidingEntity));
                         }
                         break;
 
                 }
+                if (health.currentHealth <= 0) {
+                    PlayerComponent playerComponent = ComponentList.PLAYER.get(entity);
+                    TransformComponent playerTransform = ComponentList.TRANSFORM.get(entity);
+                    if (playerComponent.respawnPlanet != null) {
+                        if (ComponentList.QUEST.has(entity))
+                            entity.remove(QuestComponent.class);
+                        game.setScreen(new PlanetHangarScreen(game,screen,engine,playerComponent.respawnPlanet));
+                    }
+                    else {
+                        Entity rndPlanet = engine.getEntitiesFor(Family.exclude(MovementComponent.class,EnemyComponent.class,ProjectileComponent.class,PlayerComponent.class).get()).random();
+                        game.setScreen(new PlanetHangarScreen(game,screen,engine,rndPlanet));
+                    }
+                }
+
                 break;
             case ENEMY:
                 switch (e2Type) {
                     case PROJECTILE:
-                        HealthComponent enemyHealth = ComponentList.HEALTH.get(entity);
                         ProjectileComponent projectile = ComponentList.PROJECTILE.get(collidingEntity);
-                        if (!projectile.shooter.equals(entity)) {
-                            enemyHealth.currentHealth -= projectile.damage;
-                            getEngine().removeEntity(collidingEntity);
-                            if (enemyHealth.currentHealth <= 0) {
-                                getEngine().removeEntity(entity);
-                                Entity player = getEngine().getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+                        TypeComponent type = ComponentList.TYPE.get(entity);
+                        TypeComponent shooterType = ComponentList.TYPE.get(projectile.shooter);
+                        if (type.type == null || type.type != shooterType.type) {
+                            health.currentHealth -= projectile.damage;
+                            engine.removeEntity(collidingEntity);
+                            if (health.currentHealth <= 0) {
+                                engine.removeEntity(entity);
+                                Entity player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
                                 if (projectile.shooter == player && ComponentList.QUEST.has(player)) {
                                     QuestComponent quest = ComponentList.QUEST.get(player);
                                     if (quest.type == QuestComponent.QuestType.KILL && quest.progress <= quest.objective) {
                                         quest.progress++;
-                                        System.out.println(quest.progress);
                                     }
                                 }
                             }
@@ -95,17 +111,5 @@ public class CollisionResolveSystem extends IteratingSystem {
 
         entity.remove(CollidingComponent.class);
 
-    }
-    
-    private void enterAPlanet(int id) {
-    	//Not every hangar are the same in function of their ID
-    	switch(id) {
-    	case 3 :
-    		game.setScreen(new PlanetHangarScreen(game, parent, engine));
-    		break;
-    	case 4 :
-    		//Change the screen
-    		break;
-    	}
     }
 }

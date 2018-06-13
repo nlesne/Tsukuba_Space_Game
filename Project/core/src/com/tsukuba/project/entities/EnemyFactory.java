@@ -1,6 +1,7 @@
 package com.tsukuba.project.entities;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,14 +14,14 @@ import java.util.Random;
 public class EnemyFactory {
 
     public static Entity spawn(PooledEngine engine, EnemyComponent.EnemyType type) {
+        TransformComponent playerTransform = ComponentList.TRANSFORM.get(engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first());
 
-        Random random = new Random();
 
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
         drawable.sprite = new TextureRegion(Assets.enemy);
         TransformComponent transform = engine.createComponent(TransformComponent.class);
-        transform.position.x = random.nextFloat() * 32;
-        transform.position.y = random.nextFloat() * 32;
+        transform.position.x = playerTransform.position.x + MathUtils.random(-16,16);
+        transform.position.y = playerTransform.position.y + MathUtils.random(-16,16);
         transform.width = 2f;
         transform.height = 3f;
 
@@ -28,7 +29,7 @@ public class EnemyFactory {
         movement.friction = 0.99f;
 
         AIComponent ai = engine.createComponent(AIComponent.class);
-        ai.detectionRadius = 16;
+        ai.detectionRadius = type == EnemyComponent.EnemyType.MINE ? 16 : 30;
 
         HealthComponent health = engine.createComponent(HealthComponent.class);
         health.maxHealth = 3;

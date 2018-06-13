@@ -13,7 +13,7 @@ import com.tsukuba.project.components.MovementComponent;
 public class MovementSystem extends IteratingSystem {
 
     public MovementSystem() {
-        super(Family.all(TransformComponent.class, MovementComponent.class).get());
+        super(Family.all(TransformComponent.class, MovementComponent.class).get(),0);
 
     }
     @Override

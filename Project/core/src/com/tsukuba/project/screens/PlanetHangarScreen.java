@@ -9,6 +9,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -16,10 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
-import com.tsukuba.project.components.ComponentList;
-import com.tsukuba.project.components.EnemyComponent;
-import com.tsukuba.project.components.PlayerComponent;
-import com.tsukuba.project.components.QuestComponent;
+import com.tsukuba.project.components.*;
 import com.tsukuba.project.entities.EnemyFactory;
 
 import java.util.Random;
@@ -29,6 +27,8 @@ public class PlanetHangarScreen extends ScreenAdapter{
 	private ScreenAdapter parent;
 	private SpaceGame game;
 	private OrthographicCamera camera;
+	private Entity player;
+	private Entity planet;
 	
 	private TextureRegion backgroundRegion;
 	private TextureRegion pilotRegion;
@@ -41,10 +41,17 @@ public class PlanetHangarScreen extends ScreenAdapter{
 	protected Stage stage;
 	protected Skin skin;
 
-	public PlanetHangarScreen(SpaceGame game, ScreenAdapter parent, PooledEngine engine) {
+	@Override
+	public void resize(int width, int height) {
+		stage.getViewport().update(width,height);
+	}
+
+	public PlanetHangarScreen(SpaceGame game, ScreenAdapter parent, PooledEngine engine, Entity planet) {
 		this.game = game;
 		this.parent = parent;
 		this.engine = engine;
+		this.planet = planet;
+		player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
@@ -57,14 +64,45 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		pilot = new Image(pilotRegion);
 		
 		stage = new Stage();
+		stage.getViewport().update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+		PlayerComponent playerComponent = ComponentList.PLAYER.get(player);
+		playerComponent.respawnPlanet = planet;
+
+		for (Entity enemy : engine.getEntitiesFor(Family.all(AIComponent.class,EnemyComponent.class).get())) {
+			EnemyComponent enemyComponent = ComponentList.ENEMY.get(enemy);
+			if (enemyComponent.type != EnemyComponent.EnemyType.BOSS)
+				engine.removeEntity(enemy);
+			else {
+				TransformComponent bossTransform = ComponentList.TRANSFORM.get(enemy);
+				TransformComponent planetTransform = ComponentList.TRANSFORM.get(planet);
+				float x = planetTransform.position.x + MathUtils.random(-64,64);
+				float y = planetTransform.position.y + MathUtils.random(-64,64);
+				bossTransform.position.set(x,y,2);
+
+				AIComponent bossAI = ComponentList.AI.get(enemy);
+				bossAI.state = AIComponent.AIState.IDLE;
+			}
+		}
+
+		for (Entity projectile : engine.getEntitiesFor(Family.all(ProjectileComponent.class).get())) {
+			engine.removeEntity(projectile);
+		}
+
+		MovementComponent playerMovement = ComponentList.MOVEMENT.get(player);
+		playerMovement.velocity.setZero();
+		playerMovement.acceleration.setZero();
+
+		engine.clearPools();
+
 	}	 
 
 	@Override
 	public void render(float delta) {
 		//Camera
 		camera.update();
-		game.batch.setProjectionMatrix(camera.combined);
+		//game.batch.setProjectionMatrix(camera.combined);
 
 		//Batch
 		stage.act(delta);
@@ -94,22 +132,25 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		questBtn.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				Entity player = engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first();
+				PlayerComponent playerComponent = ComponentList.PLAYER.get(player);
 				if (!ComponentList.QUEST.has(player)) {
 					final QuestComponent quest = engine.createComponent(QuestComponent.class);
-					Random random = new Random();
+					final Random random = new Random();
 					quest.progress = 0;
-					if (random.nextInt() > 0.5) {
+					if (random.nextFloat() > 0.5) {
 						quest.type = QuestComponent.QuestType.KILL;
-						quest.objective = 2 + random.nextInt(3);
+						quest.objective = 3 + random.nextInt(4);
 						quest.reward = quest.objective * 10;
 						for (int i = 0; i < quest.objective; i++) {
-							EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
+							if (i%2 == 0)
+								EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
+							else
+								EnemyFactory.spawn(engine,EnemyComponent.EnemyType.SHOOTER);
 						}
 					}
 					else {
 						quest.type = QuestComponent.QuestType.SURVIVE;
-						quest.objective = 120;
+						quest.objective = 60;
 						quest.reward = 50;
 						Timer.schedule(new Timer.Task() {
 							@Override
@@ -121,9 +162,12 @@ public class PlanetHangarScreen extends ScreenAdapter{
 						Timer.schedule(new Timer.Task() {
 							@Override
 							public void run() {
-								EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+								if (random.nextFloat() > 0.4)
+									EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
+								else
+									EnemyFactory.spawn(engine,EnemyComponent.EnemyType.SHOOTER);
 							}
-						},0,10,quest.objective/10);
+						},0,quest.objective/10,quest.objective/10-1);
 					}
 					player.add(quest);
 				}
@@ -131,7 +175,6 @@ public class PlanetHangarScreen extends ScreenAdapter{
 					QuestComponent quest = ComponentList.QUEST.get(player);
 					if (quest.progress >= quest.objective) {
 						player.remove(QuestComponent.class);
-						PlayerComponent playerComponent = ComponentList.PLAYER.get(player);
 						playerComponent.money += quest.reward;
 					}
 				}
@@ -147,8 +190,7 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		exit.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(parent); 
-				dispose();
+				onExit();
 			}
 		});
 		
@@ -173,11 +215,21 @@ public class PlanetHangarScreen extends ScreenAdapter{
 
 	private void handleInput() {
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-			game.setScreen(parent); 
+			onExit();
 		}
 	}
 	
 	private void changeToUpgradeScreen() {
 		game.setScreen(new UpgradeScreen(game, this, engine));
+	}
+
+	private void onExit() {
+		TransformComponent playerTransform = ComponentList.TRANSFORM.get(player);
+		TransformComponent planetTransform = ComponentList.TRANSFORM.get(planet);
+		playerTransform.position.set(planetTransform.position);
+		HealthComponent playerHealth = ComponentList.HEALTH.get(player);
+		playerHealth.currentHealth = playerHealth.maxHealth;
+		game.setScreen(parent);
+		dispose();
 	}
 }

@@ -1,6 +1,7 @@
 package com.tsukuba.project.screens;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
@@ -10,30 +11,25 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
-import com.tsukuba.project.entities.BulletFactory;
-import com.tsukuba.project.entities.EnemyFactory;
-import com.tsukuba.project.entities.PlanetFactory;
-import com.tsukuba.project.entities.PlayerShipFactory;
+import com.tsukuba.project.entities.*;
 import com.tsukuba.project.systems.*;
 
 import java.util.Random;
 
 public class GameScreen extends ScreenAdapter {
 
-	private int MAX_PLANET = 200;
+	private int MAX_PLANET = 5;
 
-	//	private OrthographicCamera cameraMiniMap;
-	//	private SpriteBatch batchMiniMap;
+//	private OrthographicCamera cameraMiniMap;
+//	private SpriteBatch batchMiniMap;
 
-	private SpaceGame game;
-	private PooledEngine engine;
-	private ShapeRenderer shape;
-	private OrthographicCamera camera;
+    private SpaceGame game;
+    private PooledEngine engine;
+    private ShapeRenderer shape;
+    private OrthographicCamera camera;
 	private float accumulator = 0f;
 
 	private OrthographicCamera hudCamera;
@@ -43,39 +39,21 @@ public class GameScreen extends ScreenAdapter {
 	private SpriteBatch starfield;
 
 	private boolean camera_lock = true;
-	private int cooldown;
-	private boolean toggleDebug;
 
 	public GameScreen(SpaceGame game) {
 		this.game = game;
-		engine = new PooledEngine();
 		shape = new ShapeRenderer();
 
 		starfield = new SpriteBatch();
 		hud = new SpriteBatch();
 
-		generatePlanets();
+        initEngine();
+        generatePlanets();
 
-		//Player
-		PlayerShipFactory.create(engine,16,16);
+        PlayerShipFactory.create(engine,16,16);
+        BossFactory.spawn(engine);
 
-		//Enemy
-		EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
-		//EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
-
-
-		engine.addSystem(new MovementSystem());
-		engine.addSystem(new RenderingSystem(game.batch));
-		engine.addSystem(new AISystem());
-		engine.addSystem(new HitboxUpdateSystem(game.batch));
-		camera = engine.getSystem(RenderingSystem.class).getCamera();
-		engine.addSystem(new HUDSystem(hud));
-		engine.addSystem(new DebugSystem(game.batch));
-		engine.addSystem(new StarfieldParallaxSystem(shape));
-		engine.addSystem(new IndicatorSystem(camera,game.batch));
-		engine.addSystem(new CollisionDetectionSystem(engine));
-		engine.addSystem(new CollisionResolveSystem(engine,game, this));
-		game.batch.setProjectionMatrix(camera.combined);
+        game.batch.setProjectionMatrix(camera.combined);
 
 		starfieldCamera = engine.getSystem(RenderingSystem.class).getCamera();
 		starfield.setProjectionMatrix(starfieldCamera.combined);
@@ -86,14 +64,29 @@ public class GameScreen extends ScreenAdapter {
 		//        cameraMiniMap = new OrthographicCamera(800,480);
 		//        cameraMiniMap.zoom = 4;
 		//        batchMiniMap = new SpriteBatch();
-
-		cooldown = 10;
-		toggleDebug = false;
 	}
 
-	@Override
+    private void initEngine() {
+        engine = new PooledEngine();
+
+        engine.addSystem(new MovementSystem());
+        engine.addSystem(new RenderingSystem(game.batch));
+        engine.addSystem(new AISystem(engine));
+        engine.addSystem(new ProjectileSystem(engine));
+        engine.addSystem(new HitboxUpdateSystem(game.batch));
+        camera = engine.getSystem(RenderingSystem.class).getCamera();
+        engine.addSystem(new IndicatorSystem(camera,game.batch));
+        engine.addSystem(new CollisionDetectionSystem(engine));
+        engine.addSystem(new CollisionResolveSystem(engine,game,this));
+        engine.addSystem(new StarfieldParallaxSystem(shape));
+        engine.addSystem(new HUDSystem(hud));
+        engine.addSystem(new DebugSystem(game.batch));
+        engine.getSystem(DebugSystem.class).setProcessing(false);
+    }
+
+    @Override
 	public void render(float delta) {
-		engine.update(delta);        
+		engine.update(delta);
 		//cameraMiniMap.update();
 		//batchMiniMap.setProjectionMatrix(cameraMiniMap.combined);
 
@@ -102,35 +95,37 @@ public class GameScreen extends ScreenAdapter {
 		accumulator += delta;
 		handleCamera(camera, playerEntity, delta);
 		handleInput(playerEntity,delta);
-		cooldown-=1;
 	}
 
-	private void generatePlanets() {
-		Random rand = new Random();
 
-		//Planet
-		for(int i = 0; i < MAX_PLANET; i++) {  
-			// P(0) = 0.7, P(1) = 0.2, P(2) = 0.05, P(3) = 0.049, P(4) = 0.001.
-			int size = rand.nextInt(100)+1;
-			if(size<=70)
-				size = 0;
-			if(size>70 && size<=90)
-				size = 1;
-			if(size>90 && size<=95)
-				size = 2;
-			if(size>95 && size<=99)
-				size = 3;
-			if(size>99)
-				size = 4;
-			PlanetFactory.create(engine,rand.nextInt(1001)-500,rand.nextInt(1001)-500,size,i);
-		}
-	}
+   
+    private void generatePlanets() {
+    	Random rand = new Random();
+        
+        //Planet
+        for(int i = 0; i < MAX_PLANET; i++) {  
+        	// P(0) = 0.7, P(1) = 0.2, P(2) = 0.05, P(3) = 0.049, P(4) = 0.001.
+        	int size = rand.nextInt(100)+1;
+        	if(size<=70)
+        		size = 0;
+        	if(size>70 && size<=90)
+        		size = 1;
+        	if(size>90 && size<=95)
+        		size = 2;
+        	if(size>95 && size<=99)
+        		size = 3;
+        	if(size>99)
+        		size = 4;
+        	PlanetFactory.create(engine,rand.nextInt(64)-32,rand.nextInt(64)-32,size);
+        }
+    }
 
 
 	private void handleCamera(OrthographicCamera camera, Entity playerEntity, float delta) {
 
 		PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
 		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
+		UpgradeComponent upgrade = ComponentList.UPGRADE.get(playerEntity);
 
 		if(camera_lock) {
 			camera.position.set(transform.position.x,transform.position.y,0);
@@ -138,11 +133,11 @@ public class GameScreen extends ScreenAdapter {
 			//System.out.println("X : " +  transform.position.x + " / Y : " + transform.position.y);
 		}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.zoom += 0.02;
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+			camera.zoom += camera.zoom <= 4 ? 0.02 : 0;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			camera.zoom -= 0.02;
+			camera.zoom -= camera.zoom > 0.04 ? 0.02 : 0;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
 			camera.translate(-1, 0, 0);
@@ -168,7 +163,7 @@ public class GameScreen extends ScreenAdapter {
 			camera_lock = true;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			if (accumulator >= playerComponent.shootCooldown) {
+			if (accumulator >= playerComponent.baseShootCooldown - upgrade.weaponLevel/20 + 0.05) {
 				BulletFactory.shoot(engine,playerEntity);
 				accumulator = 0f;
 			}
@@ -180,37 +175,34 @@ public class GameScreen extends ScreenAdapter {
 		MovementComponent movement = ComponentList.MOVEMENT.get(playerEntity);
 		TransformComponent transform = ComponentList.TRANSFORM.get(playerEntity);
 		DrawableComponent drawable = ComponentList.DRAWABLE.get(playerEntity);
-		
+		UpgradeComponent upgrade = ComponentList.UPGRADE.get(playerEntity);
+
 		drawable.sprite = new Sprite(Assets.spaceship);
 
-		float accelX = 0.0f;
-		float accelY = 0.0f;
-		float rotation = transform.rotation;
+        float accelX = 0.0f;
+        float accelY = 0.0f;
+        float turningRate = 0.03f + upgrade.thrustersLevel/100f;
+        float accelPow = 0.2f + upgrade.thrustersLevel/10f;
+        float rotation = transform.rotation;
 
 		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_LEFT)) {
-			rotation += 0.05f;
+			rotation += turningRate;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_RIGHT)) {
-			rotation -= 0.05f;
+			rotation -= turningRate;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_UP)) {
 			drawable.sprite = new Sprite(Assets.spaceship_firing);
-			accelX = (float) (0.3*Math.cos(rotation+Math.PI/2));
-			accelY = (float) (0.3*Math.sin(rotation+Math.PI/2));
+			accelX = (float) (accelPow*Math.cos(rotation+Math.PI/2));
+			accelY = (float) (accelPow*Math.sin(rotation+Math.PI/2));
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.DPAD_DOWN)) {
-			accelX = -(float) (0.3*Math.cos(rotation+Math.PI/2));
-			accelY = -(float) (0.3*Math.sin(rotation+Math.PI/2));
+			accelX = -(float) (accelPow*Math.cos(rotation+Math.PI/2));
+			accelY = -(float) (accelPow*Math.sin(rotation+Math.PI/2));
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.F2) && cooldown<0) {
-			if(toggleDebug) {
-				engine.getSystem(DebugSystem.class).setProcessing(true);
-				toggleDebug = false;
-			} else {
-				engine.getSystem(DebugSystem.class).setProcessing(false);
-				toggleDebug = true;
-			}
-			cooldown = 25;
+		if(Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+			EntitySystem debugSystem = engine.getSystem(DebugSystem.class);
+			debugSystem.setProcessing(!debugSystem.checkProcessing());
 		}
 		movement.velocity.add(accelX,accelY);
 		transform.rotation=rotation;

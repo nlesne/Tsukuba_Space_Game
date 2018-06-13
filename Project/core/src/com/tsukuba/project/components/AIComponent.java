@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool;
 
 public class AIComponent implements Component, Pool.Poolable {
 
-    public enum AIState {WANDER,CHARGE,IDLE,FLEE,AIM}
+    public enum AIState {WANDER, ATTACK,IDLE,FLEE}
 
     public AIState state = AIState.IDLE;
     public float detectionRadius;

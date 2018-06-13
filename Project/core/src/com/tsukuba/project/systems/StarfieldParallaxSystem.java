@@ -23,7 +23,7 @@ public class StarfieldParallaxSystem extends EntitySystem {
 	private Array<Vector3> starfield;
 	
 	public StarfieldParallaxSystem(ShapeRenderer shape) {
-		
+		priority = 5;
 		this.shape = shape;
 		this.starfield = parallaxStarfieldCreate();
 	}

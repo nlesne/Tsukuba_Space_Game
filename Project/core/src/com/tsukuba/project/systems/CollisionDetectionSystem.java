@@ -15,7 +15,7 @@ public class CollisionDetectionSystem extends IteratingSystem {
     PooledEngine engine;
 
     public CollisionDetectionSystem(PooledEngine engine) {
-        super(Family.all(HitboxComponent.class,TransformComponent.class).get());
+        super(Family.all(HitboxComponent.class,TransformComponent.class).get(),2);
         this.engine = engine;
     }
 
@@ -25,7 +25,7 @@ public class CollisionDetectionSystem extends IteratingSystem {
         ImmutableArray<Entity> entities = getEngine().getEntitiesFor(getFamily());
 
         for (Entity e : entities) {
-            if (!e.equals(entity)) {
+            if (!e.equals(entity) && !e.isScheduledForRemoval() && !entity.isScheduledForRemoval()) {
                 HitboxComponent otherHitbox = ComponentList.HITBOX.get(e);
                 if (Intersector.overlapConvexPolygons(hitbox.shape,otherHitbox.shape)) {
                     CollidingComponent collidingComponent = engine.createComponent(CollidingComponent.class);

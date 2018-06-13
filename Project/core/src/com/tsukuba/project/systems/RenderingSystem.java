@@ -25,7 +25,7 @@ public class RenderingSystem extends SortedIteratingSystem{
     private ArrayList<Entity> renderQueue;
 
     public RenderingSystem(SpriteBatch batch) {
-        super(Family.all(DrawableComponent.class,TransformComponent.class).get(), new ZComparator());
+        super(Family.all(DrawableComponent.class,TransformComponent.class).get(), new ZComparator(),5);
         renderQueue = new ArrayList<Entity>();
         this.batch = batch;
         camera = new OrthographicCamera(GAME_WIDTH,GAME_HEIGHT);

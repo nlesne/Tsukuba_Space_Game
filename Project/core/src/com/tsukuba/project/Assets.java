@@ -24,15 +24,19 @@ public class Assets {
     public static Texture hud_rocket;
     public static Texture hud_turret;
     public static Texture hud_rocket2;
+    public static Texture boss;
    
     
-    public static TextureRegion playerBullet;
+    public static TextureRegion bulletLvl1;
+    public static TextureRegion bulletLvl2;
+    public static TextureRegion bulletLvl3;
 
     public static Texture loadTexture(String file) {
         return new Texture(Gdx.files.internal(file));
     }
 
     public static void load() {
+        boss = loadTexture("old_spaceship.png");
     	hud_core = loadTexture("spaceship_core.png");
     	hud_rocket = loadTexture("spaceship_rocket.png");
     	hud_rocket2 = loadTexture("spaceship_upgrade/spaceship_rocket2.png");
@@ -51,6 +55,8 @@ public class Assets {
         enemy = loadTexture("enemy.png");
         arrow = loadTexture("arrow.png");
         bullets = loadTexture("bullets.png");
-        playerBullet = new TextureRegion(bullets,21,14,10,6);
+        bulletLvl1 = new TextureRegion(bullets,21,32,10,6);
+        bulletLvl2 = new TextureRegion(bullets,21,50,10,6);
+        bulletLvl3 = new TextureRegion(bullets, 21,14,10,6);
      }
 }

@@ -8,29 +8,45 @@ import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.*;
 
 public class BulletFactory {
-    public static Entity shoot(PooledEngine engine, Entity player) {
-        TransformComponent playerTransform = ComponentList.TRANSFORM.get(player);
+    public static final float BASE_BULLET_SPREAD = 10; // degrees
+    public static final float BASE_BULLET_SPEED = 10; // meters/second
+    public static Entity shoot(final PooledEngine engine, Entity shooter) {
+        TransformComponent shooterTransform = ComponentList.TRANSFORM.get(shooter);
+        float bulletSpread = MathUtils.random(BASE_BULLET_SPREAD) - BASE_BULLET_SPREAD / 2;
+        float bulletSpeed = BASE_BULLET_SPEED;
 
-        Entity bullet = engine.createEntity();
+        final Entity bullet = engine.createEntity();
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
-        drawable.sprite = Assets.playerBullet;
+        drawable.sprite = Assets.bulletLvl1;
+
+        ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
+        projectile.damage = 1;
+        projectile.lifespan = 3;
+        projectile.shooter = shooter;
+        if (ComponentList.UPGRADE.has(shooter)) {
+            UpgradeComponent shooterUpgrades = ComponentList.UPGRADE.get(shooter);
+            projectile.damage = shooterUpgrades.weaponLevel;
+            projectile.lifespan = shooterUpgrades.weaponLevel * 2;
+            bulletSpread /= shooterUpgrades.weaponLevel;
+            bulletSpeed *= shooterUpgrades.weaponLevel;
+            if (shooterUpgrades.weaponLevel == 2)
+                drawable.sprite = Assets.bulletLvl2;
+            else if (shooterUpgrades.weaponLevel >= 3)
+                drawable.sprite = Assets.bulletLvl3;
+        }
 
         TransformComponent transform = engine.createComponent(TransformComponent.class);
-        float adjustedRotation = playerTransform.rotation + MathUtils.PI / 2;
-        transform.position.set(playerTransform.position.x,playerTransform.position.y,2);
+        float adjustedRotation = shooterTransform.rotation + MathUtils.PI / 2 + (bulletSpread*MathUtils.degRad);
+        transform.position.set(shooterTransform.position.x,shooterTransform.position.y,2);
         float bulletPosOffsetX = (float) (Math.cos(adjustedRotation));
         float bulletPosOffsetY = (float) (Math.sin(adjustedRotation));
         transform.position.add(bulletPosOffsetX,bulletPosOffsetY,0);
-        transform.rotation = playerTransform.rotation;
+        transform.rotation = shooterTransform.rotation;
         transform.width = 0.25f;
         transform.height = 0.5f;
 
         MovementComponent movement = engine.createComponent(MovementComponent.class);
-        movement.velocity.set(bulletPosOffsetX*30f,bulletPosOffsetY*30f);
-
-        ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
-        projectile.damage = 1;
-        projectile.shooter = player;
+        movement.velocity.set(bulletPosOffsetX,bulletPosOffsetY).nor().scl(bulletSpeed, bulletSpeed);
 
         TypeComponent type = engine.createComponent(TypeComponent.class);
         type.type = TypeComponent.EntityType.PROJECTILE;

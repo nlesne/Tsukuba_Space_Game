@@ -1,10 +1,9 @@
 package com.tsukuba.project.systems;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -34,7 +33,6 @@ public class HitboxUpdateSystem extends IteratingSystem {
 				entity.remove(CooldownComponent.class);
 			}
 		}
-		TypeComponent type = ComponentList.TYPE.get(entity);
 		hitbox.shape.setPosition(transform.position.x-hitbox.width/2,transform.position.y-hitbox.height/2);
 		hitbox.shape.setRotation(MathUtils.radDeg * transform.rotation);
 	}

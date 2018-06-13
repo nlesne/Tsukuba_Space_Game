@@ -24,7 +24,7 @@ public class DebugSystem extends IteratingSystem{
 	private OrthographicCamera textCamera;
 
 	public DebugSystem(SpriteBatch batch) {
-		super(Family.all(HitboxComponent.class,TransformComponent.class).get());
+		super(Family.all(HitboxComponent.class,TransformComponent.class).get(),5);
 		this.batch = batch;
 
 		shape = new ShapeRenderer();
