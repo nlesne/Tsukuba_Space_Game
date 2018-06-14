@@ -133,13 +133,13 @@ public class GameScreen extends ScreenAdapter {
 			//System.out.println("X : " +  transform.position.x + " / Y : " + transform.position.y);
 		}
 
-        if (Gdx.input.isKeyPressed(Input.Keys.C)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
 			camera.zoom += camera.zoom <= 4 ? 0.02 : 0;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.C)) {
 			camera.zoom -= camera.zoom > 0.04 ? 0.02 : 0;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.Q) && Gdx.input.isKeyPressed(Input.Keys.A)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.Q) || Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.translate(-1, 0, 0);
 			//If the LEFT Key is pressed, translate the camera -3 units in the X-Axis
 			camera_lock = false;
@@ -154,7 +154,7 @@ public class GameScreen extends ScreenAdapter {
 			//If the DOWN Key is pressed, translate the camera -3 units in the Y-Axis
 			camera_lock = false;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.Z) && Gdx.input.isKeyPressed(Input.Keys.W)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.Z) || Gdx.input.isKeyPressed(Input.Keys.W)) {
 			camera.translate(0, 1, 0);
 			//If the UP Key is pressed, translate the camera 3 units in the Y-Axis
 			camera_lock = false;

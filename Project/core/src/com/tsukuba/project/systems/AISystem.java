@@ -18,6 +18,10 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 public class AISystem extends IteratingSystem {
 
     PooledEngine engine;
+    float bossShootAccumulator = 0f;
+    float shooterShootAccumulator = 0f;
+    float shooterSpawnAccumulator = 0f;
+    float mineSpawnAccumulator = 0f;
 
     public AISystem(PooledEngine engine) {
         super(Family.all(EnemyComponent.class, AIComponent.class, TransformComponent.class).get(),1);
@@ -40,55 +44,6 @@ public class AISystem extends IteratingSystem {
                 if (distToPlayer <= ai.detectionRadius) {
                     ai.state = AIComponent.AIState.ATTACK;
                     ai.target = player;
-
-                    switch (enemyType) {
-                        case SHOOTER:
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    if (ai.state == AIComponent.AIState.ATTACK)
-                                        BulletFactory.shoot(engine, entity);
-                                    else
-                                        Timer.instance().clear();
-                                }
-                            }, 1, 0.25f);
-                            break;
-                        case BOSS:
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    if (ai.state == AIComponent.AIState.ATTACK) {
-                                        Entity spawned = EnemyFactory.spawn(engine, EnemyComponent.EnemyType.SHOOTER);
-                                        TransformComponent spawnedTransform = ComponentList.TRANSFORM.get(spawned);
-                                        spawnedTransform.position.set(transform.position).add(MathUtils.random(-10, 10), MathUtils.random(-15, 15), 0);
-                                    }
-                                    else
-                                        Timer.instance().clear();
-                                }
-                            }, 1, 10);
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    if (ai.state == AIComponent.AIState.ATTACK) {
-                                        Entity spawned = EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
-                                        TransformComponent spawnedTransform = ComponentList.TRANSFORM.get(spawned);
-                                        spawnedTransform.position.set(transform.position);
-                                    }
-                                    else
-                                        Timer.instance().clear();
-                                }
-                            }, 5, 5);
-                            Timer.schedule(new Timer.Task() {
-                                @Override
-                                public void run() {
-                                    if (ai.state != AIComponent.AIState.IDLE)
-                                        BulletFactory.shoot(engine, entity);
-                                    else
-                                        Timer.instance().clear();
-                                }
-                            }, 1, 0.2f);
-                            break;
-                    }
                 }
                 break;
             case ATTACK: {
@@ -105,6 +60,7 @@ public class AISystem extends IteratingSystem {
                         transform.rotation = lerpedAngle - PI / 2;
                         break;
                     case SHOOTER:
+                        shooterShootAccumulator += deltaTime;
                         transform.rotation = targetAngle - PI / 2;
                         if (distToPlayer > 10) {
                             movement.acceleration.set(8 * cos(lerpedAngle), 8 * sin(lerpedAngle));
@@ -112,14 +68,33 @@ public class AISystem extends IteratingSystem {
                             movement.acceleration.setZero();
                             movement.velocity.scl(0.9f);
                         }
+                        if (shooterShootAccumulator > 0.25) {
+                            BulletFactory.shoot(engine, entity);
+                            shooterShootAccumulator -= 0.25;
+                        }
                         break;
                     case BOSS:
+                        bossShootAccumulator += deltaTime;
+                        shooterSpawnAccumulator += deltaTime;
+                        mineSpawnAccumulator += deltaTime;
+                        transform.rotation = targetAngle - PI / 2;
+                        if (shooterSpawnAccumulator > 10) {
+                            Entity spawned = EnemyFactory.spawn(engine, EnemyComponent.EnemyType.SHOOTER);
+                            TransformComponent spawnedTransform = ComponentList.TRANSFORM.get(spawned);
+                            spawnedTransform.position.set(transform.position).add(MathUtils.random(-10, 10), MathUtils.random(-15, 15), 0);
+                            shooterSpawnAccumulator -= 10;
+                        }
+                        spawnMine(transform);
+                        if (bossShootAccumulator > 0.2) {
+                            BulletFactory.shoot(engine, entity);
+                            bossShootAccumulator -= 0.2;
+                        }
                         HealthComponent health = ComponentList.HEALTH.get(entity);
                         if (health.currentHealth <= health.maxHealth / 2) {
                             ai.state = AIComponent.AIState.FLEE;
                             movement.friction = 0.985f;
 
-                            for (int i = 0; i < 8; i++) {
+                            for (int i = 0; i < 6; i++) {
                                 EnemyComponent.EnemyType type;
                                 Vector3 position = new Vector3();
 
@@ -135,27 +110,42 @@ public class AISystem extends IteratingSystem {
                                 spawnTransform.position = position;
                             }
                         }
-                        transform.rotation = targetAngle - PI / 2;
                         break;
                 }
             }
                 break;
 
             case FLEE:
-                TransformComponent targetTransform = ComponentList.TRANSFORM.get(ai.target);
-                float targetX = targetTransform.position.x;
-                float targetY = targetTransform.position.y;
-                float targetAngle = MathUtils.atan2(targetY - transform.position.y, targetX - transform.position.x);
+                switch (enemyType) {
+                    case BOSS:
+                        shooterSpawnAccumulator += deltaTime;
+                        mineSpawnAccumulator += deltaTime;
+                        spawnMine(transform);
+                        TransformComponent targetTransform = ComponentList.TRANSFORM.get(ai.target);
+                    float targetX = targetTransform.position.x;
+                    float targetY = targetTransform.position.y;
+                    float targetAngle = MathUtils.atan2(targetY - transform.position.y, targetX - transform.position.x);
 
-                MovementComponent targetMovement = ComponentList.MOVEMENT.get(ai.target);
+                    MovementComponent targetMovement = ComponentList.MOVEMENT.get(ai.target);
 
-                transform.rotation = targetAngle - PI / 2;
-                if (distToPlayer < 16)
-                    movement.acceleration.set(targetMovement.velocity);
-                else
-                    movement.friction = 0.9f;
+                    transform.rotation = targetAngle - PI / 2;
+                    if (distToPlayer < 16)
+                        movement.acceleration.set(targetMovement.velocity);
+                    else
+                        movement.friction = 0.9f;
+                    break;
+                }
                 break;
 
+        }
+    }
+
+    private void spawnMine(TransformComponent transform) {
+        if (mineSpawnAccumulator > 5) {
+            Entity spawned = EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
+            TransformComponent spawnedTransform = ComponentList.TRANSFORM.get(spawned);
+            spawnedTransform.position.set(transform.position);
+            mineSpawnAccumulator -= 5;
         }
     }
 }

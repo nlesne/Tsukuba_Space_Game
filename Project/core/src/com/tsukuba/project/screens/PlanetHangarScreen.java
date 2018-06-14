@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.SpaceGame;
 import com.tsukuba.project.components.*;
+import com.tsukuba.project.entities.BossFactory;
 import com.tsukuba.project.entities.EnemyFactory;
 
 import java.util.Random;
@@ -80,14 +81,8 @@ public class PlanetHangarScreen extends ScreenAdapter{
 			if (enemyComponent.type != EnemyComponent.EnemyType.BOSS)
 				engine.removeEntity(enemy);
 			else {
-				TransformComponent bossTransform = ComponentList.TRANSFORM.get(enemy);
-				TransformComponent planetTransform = ComponentList.TRANSFORM.get(planet);
-				float x = planetTransform.position.x + MathUtils.random(-256,256);
-				float y = planetTransform.position.y + MathUtils.random(-256,256);
-				bossTransform.position.set(x,y,2);
-
-				AIComponent bossAI = ComponentList.AI.get(enemy);
-				bossAI.state = AIComponent.AIState.IDLE;
+				engine.removeEntity(enemy);
+				BossFactory.spawn(engine);
 			}
 		}
 

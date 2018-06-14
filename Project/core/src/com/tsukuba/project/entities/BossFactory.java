@@ -51,7 +51,7 @@ public class BossFactory {
         health.currentHealth = health.maxHealth;
 
         UpgradeComponent upgrade = engine.createComponent(UpgradeComponent.class);
-        upgrade.weaponLevel = 3;
+        upgrade.weaponLevel = 2;
 
         Entity boss = engine.createEntity();
         boss.add(transform);
