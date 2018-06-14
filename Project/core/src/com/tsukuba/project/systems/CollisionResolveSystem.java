@@ -41,26 +41,30 @@ public class CollisionResolveSystem extends IteratingSystem {
 
         switch (e1Type) {
             case PLAYER:
+                if (ComponentList.COOLDOWN.has(entity) || ComponentList.COOLDOWN.has(collidingEntity))
+                    return;
+
+                CooldownComponent cooldown = engine.createComponent(CooldownComponent.class);
+                cooldown.value = 3;
                 switch (e2Type){
                     case PROJECTILE:
                         ProjectileComponent projectile = ComponentList.PROJECTILE.get(collidingEntity);
                         if (!projectile.shooter.equals(entity)) {
                             health.currentHealth -= projectile.damage;
                             engine.removeEntity(collidingEntity);
+                            entity.add(cooldown);
                         }
                         break;
                     case ENEMY:
-                        if (!ComponentList.COOLDOWN.has(entity)) {
                             EnemyComponent enemy = ComponentList.ENEMY.get(collidingEntity);
                             health.currentHealth -= enemy.contactDamage;
                             MovementComponent playerMovement = ComponentList.MOVEMENT.get(entity);
                             MovementComponent enemyMovement = ComponentList.MOVEMENT.get(collidingEntity);
                             playerMovement.velocity.scl(-1f);
-                            enemyMovement.velocity.scl(-1f);
-                            CooldownComponent cooldown = engine.createComponent(CooldownComponent.class);
-                            cooldown.value = 2;
-                            entity.add(cooldown);
-                        }
+                            if (enemy.type == EnemyComponent.EnemyType.MINE)
+                                engine.removeEntity(collidingEntity);
+                            if (!ComponentList.COOLDOWN.has(entity))
+                                entity.add(cooldown);
                         break;
                     case PLANET:
                         if (Gdx.input.isKeyPressed(Input.Keys.X)) {
@@ -71,7 +75,6 @@ public class CollisionResolveSystem extends IteratingSystem {
                 }
                 if (health.currentHealth <= 0) {
                     PlayerComponent playerComponent = ComponentList.PLAYER.get(entity);
-                    TransformComponent playerTransform = ComponentList.TRANSFORM.get(entity);
                     if (playerComponent.respawnPlanet != null) {
                         if (ComponentList.QUEST.has(entity))
                             entity.remove(QuestComponent.class);

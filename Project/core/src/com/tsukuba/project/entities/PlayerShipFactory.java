@@ -30,6 +30,7 @@ public class PlayerShipFactory {
         movementComponent.friction = 0.99f;
         
         UpgradeComponent upgradeComponent = engine.createComponent(UpgradeComponent.class);
+        upgradeComponent.weaponLevel = 3;
 
         TypeComponent typeComponent = engine.createComponent(TypeComponent.class);
         typeComponent.type = TypeComponent.EntityType.PLAYER;

@@ -13,7 +13,7 @@ public class BossFactory {
     public static Entity spawn(PooledEngine engine) {
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         Random random = new Random();
-        transform.position.set(random.nextInt(256)-128,random.nextInt(256)-128,2);
+        transform.position.set(random.nextInt(512)-256,random.nextInt(512)-256,2);
         transform.width = 5;
         transform.height = 5;
 
