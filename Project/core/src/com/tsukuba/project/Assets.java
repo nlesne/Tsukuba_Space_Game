@@ -21,10 +21,15 @@ public class Assets {
     public static Texture hud_fullH;
     public static Texture hud_halfH;
     public static Texture hud_emptyH;
-    public static Texture hud_core;
-    public static Texture hud_rocket;
-    public static Texture hud_turret;
+    public static Texture hud_core1;
+    public static Texture hud_core2;
+    public static Texture hud_core3;
+    public static Texture hud_weapon1;
+    public static Texture hud_weapon2;
+    public static Texture hud_weapon3;
+    public static Texture hud_rocket1;
     public static Texture hud_rocket2;
+    public static Texture hud_rocket3;
     public static Texture boss;
    
     
@@ -38,10 +43,15 @@ public class Assets {
 
     public static void load() {
         boss = loadTexture("old_spaceship.png");
-    	hud_core = loadTexture("spaceship_core.png");
-    	hud_rocket = loadTexture("spaceship_rocket.png");
+    	hud_core1 = loadTexture("spaceship_upgrade/spaceship_core.png");
+    	hud_core2 = loadTexture("spaceship_upgrade/spaceship_core2.png");
+    	hud_core3 = loadTexture("spaceship_upgrade/spaceship_core3.png");
+        hud_rocket1 = loadTexture("spaceship_upgrade/spaceship_rocket.png");
     	hud_rocket2 = loadTexture("spaceship_upgrade/spaceship_rocket2.png");
-    	hud_turret = loadTexture("spaceship_turret.png");
+        hud_rocket3 = loadTexture("spaceship_upgrade/spaceship_rocket3.png");
+    	hud_weapon1 = loadTexture("spaceship_upgrade/spaceship_turret.png");
+        hud_weapon2 = loadTexture("spaceship_upgrade/spaceship_turret2.png");
+        hud_weapon3 = loadTexture("spaceship_upgrade/spaceship_turret3.png");
     	hud_fullH = loadTexture("fullHeart.png");
     	hud_halfH = loadTexture("halfHeart.png");
     	hud_emptyH = loadTexture("emptyHeart.png");

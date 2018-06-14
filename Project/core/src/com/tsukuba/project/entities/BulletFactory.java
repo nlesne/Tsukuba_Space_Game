@@ -30,7 +30,7 @@ public class BulletFactory {
             projectile.damage = shooterUpgrades.weaponLevel;
             projectile.lifespan = shooterUpgrades.weaponLevel * 2;
             bulletSpread /= shooterUpgrades.weaponLevel;
-            bulletSpeed *= shooterUpgrades.weaponLevel*3;
+            bulletSpeed *= shooterUpgrades.weaponLevel;
             if (shooterUpgrades.weaponLevel == 2)
                 drawable.sprite = Assets.bulletLvl2;
             else if (shooterUpgrades.weaponLevel >= 3)

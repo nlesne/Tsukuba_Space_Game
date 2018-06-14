@@ -19,7 +19,7 @@ public class HUDSystem extends EntitySystem {
 	private Sprite heart;
 	private Sprite core;
 	private Sprite rocket;
-	private Sprite turret;
+	private Sprite weapon;
 	private ShapeRenderer shape;
 	private BitmapFont font;
 	private SpriteBatch hudBatch;
@@ -31,9 +31,9 @@ public class HUDSystem extends EntitySystem {
 		font = new BitmapFont();
 
 		heart = new Sprite(Assets.hud_fullH);
-		core = new Sprite(Assets.hud_core);
-		rocket = new Sprite(Assets.hud_rocket);
-		turret = new Sprite(Assets.hud_turret);
+		core = new Sprite(Assets.hud_core1);
+		rocket = new Sprite(Assets.hud_rocket1);
+		weapon = new Sprite(Assets.hud_weapon1);
 
 		this.batch = batch;
 		hudBatch = new SpriteBatch();
@@ -88,10 +88,10 @@ public class HUDSystem extends EntitySystem {
 		rocket.setOriginCenter();
 		rocket.draw(batch);
 
-		turret.setSize(3f, 3f);
-		turret.setPosition(8f,-8f);	
-		turret.setOriginCenter();
-		turret.draw(batch);
+		weapon.setSize(3f, 3f);
+		weapon.setPosition(8f,-8f);
+		weapon.setOriginCenter();
+		weapon.draw(batch);
 
 		batch.end();
 
@@ -115,7 +115,7 @@ public class HUDSystem extends EntitySystem {
 		font.draw(hudBatch, message, 0,Gdx.graphics.getHeight());
 
 		PlayerComponent playerComponent = ComponentList.PLAYER.get(playerEntity);
-		font.draw(hudBatch,"Money : " + playerComponent.money,Gdx.graphics.getWidth()-100,Gdx.graphics.getHeight());
+		font.draw(hudBatch,"Money : " + playerComponent.money,Gdx.graphics.getWidth()-Gdx.graphics.getWidth()/6,Gdx.graphics.getHeight());
 		font.getData().setScale(1f);
 		hudBatch.end();
 	}
@@ -126,10 +126,13 @@ public class HUDSystem extends EntitySystem {
 		//Core Upgrade
 		switch(playerUpgrade.coreLevel) {
 		case 1 :
+			core = new Sprite(Assets.hud_core1);
 			break;
 		case 2:
+			core = new Sprite(Assets.hud_core2);
 			break;
 		case 3:
+			core = new Sprite(Assets.hud_core3);
 			break;
 			//Add here others sprites upgrade
 		}
@@ -137,12 +140,13 @@ public class HUDSystem extends EntitySystem {
 		//Rocket Upgrade
 		switch(playerUpgrade.thrustersLevel) {
 		case 1 :
-			rocket = new Sprite(Assets.hud_rocket);
+			rocket = new Sprite(Assets.hud_rocket1);
 			break;
 		case 2:
 			rocket = new Sprite(Assets.hud_rocket2);
 			break;
 		case 3:
+			rocket = new Sprite(Assets.hud_rocket3);
 			break;
 			//Add here others sprites upgrade
 		}
@@ -150,10 +154,13 @@ public class HUDSystem extends EntitySystem {
 		//Turret Upgrade
 		switch(playerUpgrade.weaponLevel) {
 		case 1 :
+			weapon = new Sprite(Assets.hud_weapon1);
 			break;
 		case 2:
+			weapon = new Sprite(Assets.hud_weapon2);
 			break;
 		case 3:
+			weapon = new Sprite(Assets.hud_weapon3);
 			break;
 			//Add here others sprites upgrade
 		}
