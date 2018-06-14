@@ -41,7 +41,7 @@ public class CollisionResolveSystem extends IteratingSystem {
 
         switch (e1Type) {
             case PLAYER:
-                if (ComponentList.COOLDOWN.has(entity))
+                if (ComponentList.COOLDOWN.has(entity) || ComponentList.COOLDOWN.has(collidingEntity))
                     return;
 
                 CooldownComponent cooldown = engine.createComponent(CooldownComponent.class);
@@ -61,7 +61,8 @@ public class CollisionResolveSystem extends IteratingSystem {
                             MovementComponent playerMovement = ComponentList.MOVEMENT.get(entity);
                             MovementComponent enemyMovement = ComponentList.MOVEMENT.get(collidingEntity);
                             playerMovement.velocity.scl(-1f);
-                            enemyMovement.velocity.scl(-1f);
+                            if (enemy.type == EnemyComponent.EnemyType.MINE)
+                                engine.removeEntity(collidingEntity);
                             if (!ComponentList.COOLDOWN.has(entity))
                                 entity.add(cooldown);
                         break;

@@ -9,7 +9,8 @@ public class Assets {
     public static Texture spaceship;
     public static Texture spaceship_firing;
     public static Texture arrow;
-    public static Texture enemy;
+    public static Texture kamikaze;
+    public static Texture shooter;
     public static Texture bullets;
     public static Texture planet;
     public static Texture planetHangar;
@@ -52,7 +53,8 @@ public class Assets {
     	planetHangar = loadTexture("planet.png");
     	spaceship_firing = loadTexture("spaceship_firing.png");
     	spaceship = loadTexture("spaceship.png");
-        enemy = loadTexture("enemy.png");
+        kamikaze = loadTexture("kamikaze.png");
+        shooter = loadTexture("enemy.png");
         arrow = loadTexture("arrow.png");
         bullets = loadTexture("bullets.png");
         bulletLvl1 = new TextureRegion(bullets,21,32,10,6);

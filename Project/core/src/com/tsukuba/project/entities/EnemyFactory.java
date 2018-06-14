@@ -9,15 +9,13 @@ import com.badlogic.gdx.math.Polygon;
 import com.tsukuba.project.Assets;
 import com.tsukuba.project.components.*;
 
-import java.util.Random;
-
 public class EnemyFactory {
 
     public static Entity spawn(PooledEngine engine, EnemyComponent.EnemyType type) {
         TransformComponent playerTransform = ComponentList.TRANSFORM.get(engine.getEntitiesFor(Family.all(PlayerComponent.class).get()).first());
 
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
-        drawable.sprite = new TextureRegion(Assets.enemy);
+        drawable.sprite = type == EnemyComponent.EnemyType.MINE ? new TextureRegion(Assets.kamikaze) : new TextureRegion(Assets.shooter);
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         transform.position.x = playerTransform.position.x + MathUtils.random(-32,32);
         transform.position.y = playerTransform.position.y + MathUtils.random(-32,32);

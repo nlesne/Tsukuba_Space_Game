@@ -101,7 +101,7 @@ public class AISystem extends IteratingSystem {
                 switch (enemyType) {
                     case MINE:
                         movement.friction = 1;
-                        movement.acceleration.set(10 * cos(lerpedAngle), 10 * sin(lerpedAngle));
+                        movement.velocity.set(9 * cos(lerpedAngle), 9 * sin(lerpedAngle));
                         transform.rotation = lerpedAngle - PI / 2;
                         break;
                     case SHOOTER:
