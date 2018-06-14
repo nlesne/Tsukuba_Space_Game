@@ -56,9 +56,14 @@ public class CollisionResolveSystem extends IteratingSystem {
                             MovementComponent playerMovement = ComponentList.MOVEMENT.get(entity);
                             MovementComponent enemyMovement = ComponentList.MOVEMENT.get(collidingEntity);
                             playerMovement.velocity.scl(-1f);
-                            enemyMovement.velocity.scl(-1f);
+                            EnemyComponent enemyComponent = ComponentList.ENEMY.get(collidingEntity);
+                            if (enemyComponent.type == EnemyComponent.EnemyType.MINE) {
+                                engine.removeEntity(collidingEntity);
+                            }
+                            else
+                                enemyMovement.velocity.scl(-1f);
                             CooldownComponent cooldown = engine.createComponent(CooldownComponent.class);
-                            cooldown.value = 2;
+                            cooldown.value = 3;
                             entity.add(cooldown);
                         }
                         break;

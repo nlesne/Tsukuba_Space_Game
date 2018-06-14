@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.tsukuba.project.components.ComponentList;
 import com.tsukuba.project.components.TransformComponent;
 import com.tsukuba.project.components.MovementComponent;
+import com.tsukuba.project.components.TypeComponent;
 
 public class MovementSystem extends IteratingSystem {
 
@@ -20,6 +21,7 @@ public class MovementSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         TransformComponent position = ComponentList.TRANSFORM.get(entity);
         MovementComponent movement = ComponentList.MOVEMENT.get(entity);
+        TypeComponent type = ComponentList.TYPE.get(entity);
         Vector2 tmp = new Vector2();
 
         position.rotation = (float) (position.rotation%Math.toRadians(360));

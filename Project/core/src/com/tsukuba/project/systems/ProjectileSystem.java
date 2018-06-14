@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.tsukuba.project.components.ComponentList;
+import com.tsukuba.project.components.MovementComponent;
 import com.tsukuba.project.components.ProjectileComponent;
 
 public class ProjectileSystem extends IteratingSystem {

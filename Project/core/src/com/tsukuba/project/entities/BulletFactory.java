@@ -9,7 +9,7 @@ import com.tsukuba.project.components.*;
 
 public class BulletFactory {
     public static final float BASE_BULLET_SPREAD = 10; // degrees
-    public static final float BASE_BULLET_SPEED = 10; // meters/second
+    public static final float BASE_BULLET_SPEED = 30; // meters/second
     public static Entity shoot(final PooledEngine engine, Entity shooter) {
         TransformComponent shooterTransform = ComponentList.TRANSFORM.get(shooter);
         float bulletSpread = MathUtils.random(BASE_BULLET_SPREAD) - BASE_BULLET_SPREAD / 2;

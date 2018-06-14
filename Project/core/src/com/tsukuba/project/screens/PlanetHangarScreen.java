@@ -44,6 +44,9 @@ public class PlanetHangarScreen extends ScreenAdapter{
 	@Override
 	public void resize(int width, int height) {
 		stage.getViewport().update(width,height);
+		background.setHeight(height);
+		background.setWidth(width);
+
 	}
 
 	public PlanetHangarScreen(SpaceGame game, ScreenAdapter parent, PooledEngine engine, Entity planet) {
@@ -65,6 +68,8 @@ public class PlanetHangarScreen extends ScreenAdapter{
 		
 		stage = new Stage();
 		stage.getViewport().update(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+		background.setWidth(Gdx.graphics.getWidth());
+		background.setHeight(Gdx.graphics.getWidth());
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		PlayerComponent playerComponent = ComponentList.PLAYER.get(player);
@@ -77,8 +82,8 @@ public class PlanetHangarScreen extends ScreenAdapter{
 			else {
 				TransformComponent bossTransform = ComponentList.TRANSFORM.get(enemy);
 				TransformComponent planetTransform = ComponentList.TRANSFORM.get(planet);
-				float x = planetTransform.position.x + MathUtils.random(-64,64);
-				float y = planetTransform.position.y + MathUtils.random(-64,64);
+				float x = planetTransform.position.x + MathUtils.random(-256,256);
+				float y = planetTransform.position.y + MathUtils.random(-256,256);
 				bossTransform.position.set(x,y,2);
 
 				AIComponent bossAI = ComponentList.AI.get(enemy);

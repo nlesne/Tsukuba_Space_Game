@@ -163,7 +163,7 @@ public class GameScreen extends ScreenAdapter {
 			camera_lock = true;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			if (accumulator >= playerComponent.baseShootCooldown - upgrade.weaponLevel/20 + 0.05) {
+			if (accumulator >= playerComponent.baseShootCooldown - upgrade.weaponLevel/20f + 0.05) {
 				BulletFactory.shoot(engine,playerEntity);
 				accumulator = 0f;
 			}
