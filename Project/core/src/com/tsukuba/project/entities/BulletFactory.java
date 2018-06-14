@@ -19,6 +19,8 @@ public class BulletFactory {
         DrawableComponent drawable = engine.createComponent(DrawableComponent.class);
         drawable.sprite = Assets.bulletLvl1;
 
+        MovementComponent movement = engine.createComponent(MovementComponent.class);
+        
         ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
         projectile.damage = 1;
         projectile.lifespan = 3;
@@ -28,7 +30,7 @@ public class BulletFactory {
             projectile.damage = shooterUpgrades.weaponLevel;
             projectile.lifespan = shooterUpgrades.weaponLevel * 2;
             bulletSpread /= shooterUpgrades.weaponLevel;
-            bulletSpeed *= shooterUpgrades.weaponLevel;
+            bulletSpeed *= shooterUpgrades.weaponLevel*3;
             if (shooterUpgrades.weaponLevel == 2)
                 drawable.sprite = Assets.bulletLvl2;
             else if (shooterUpgrades.weaponLevel >= 3)
@@ -45,7 +47,7 @@ public class BulletFactory {
         transform.width = 0.25f;
         transform.height = 0.5f;
 
-        MovementComponent movement = engine.createComponent(MovementComponent.class);
+        
         movement.velocity.set(bulletPosOffsetX,bulletPosOffsetY).nor().scl(bulletSpeed, bulletSpeed);
 
         TypeComponent type = engine.createComponent(TypeComponent.class);
