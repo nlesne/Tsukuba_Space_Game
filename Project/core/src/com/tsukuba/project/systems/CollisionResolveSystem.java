@@ -59,7 +59,6 @@ public class CollisionResolveSystem extends IteratingSystem {
                             EnemyComponent enemy = ComponentList.ENEMY.get(collidingEntity);
                             health.currentHealth -= enemy.contactDamage;
                             MovementComponent playerMovement = ComponentList.MOVEMENT.get(entity);
-                            MovementComponent enemyMovement = ComponentList.MOVEMENT.get(collidingEntity);
                             playerMovement.velocity.scl(-1f);
                             if (enemy.type == EnemyComponent.EnemyType.MINE)
                                 engine.removeEntity(collidingEntity);
@@ -67,7 +66,7 @@ public class CollisionResolveSystem extends IteratingSystem {
                                 entity.add(cooldown);
                         break;
                     case PLANET:
-                        if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+                        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
                             game.setScreen(new PlanetHangarScreen(game, screen, engine,collidingEntity));
                         }
                         break;
