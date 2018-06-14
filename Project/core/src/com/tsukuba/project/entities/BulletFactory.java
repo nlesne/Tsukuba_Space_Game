@@ -23,7 +23,7 @@ public class BulletFactory {
         
         ProjectileComponent projectile = engine.createComponent(ProjectileComponent.class);
         projectile.damage = 1;
-        projectile.lifespan = 3;
+        projectile.lifespan = 2;
         projectile.shooter = shooter;
         if (ComponentList.UPGRADE.has(shooter)) {
             UpgradeComponent shooterUpgrades = ComponentList.UPGRADE.get(shooter);

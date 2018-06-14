@@ -21,7 +21,7 @@ public class CollisionResolveSystem extends IteratingSystem {
     GameScreen screen;
 
     public CollisionResolveSystem(PooledEngine engine, SpaceGame game, GameScreen screen) {
-        super(Family.all(CollidingComponent.class,TransformComponent.class).get(),3);
+        super(Family.all(CollidingComponent.class,TransformComponent.class).get(),2);
         this.engine = engine;
         this.game = game;
         this.screen = screen;
@@ -92,7 +92,7 @@ public class CollisionResolveSystem extends IteratingSystem {
                         ProjectileComponent projectile = ComponentList.PROJECTILE.get(collidingEntity);
                         TypeComponent type = ComponentList.TYPE.get(entity);
                         TypeComponent shooterType = ComponentList.TYPE.get(projectile.shooter);
-                        if (type.type == null || type.type != shooterType.type) {
+                        if (shooterType.type == null || type.type != shooterType.type) {
                             health.currentHealth -= projectile.damage;
                             engine.removeEntity(collidingEntity);
                             if (health.currentHealth <= 0) {

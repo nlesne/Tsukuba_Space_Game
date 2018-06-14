@@ -157,15 +157,19 @@ public class PlanetHangarScreen extends ScreenAdapter{
 							public void run() {
 								quest.progress++;
 							}
-						},1,1,quest.objective);
+						},1,1,quest.objective-1);
 
 						Timer.schedule(new Timer.Task() {
 							@Override
 							public void run() {
-								if (random.nextFloat() > 0.4)
-									EnemyFactory.spawn(engine,EnemyComponent.EnemyType.MINE);
-								else
-									EnemyFactory.spawn(engine,EnemyComponent.EnemyType.SHOOTER);
+							    if (ComponentList.QUEST.has(player)) {
+                                    if (random.nextFloat() > 0.4)
+                                        EnemyFactory.spawn(engine, EnemyComponent.EnemyType.MINE);
+                                    else
+                                        EnemyFactory.spawn(engine, EnemyComponent.EnemyType.SHOOTER);
+                                }
+                                else
+                                    Timer.instance().clear();
 							}
 						},0,quest.objective/10,quest.objective/10-1);
 					}

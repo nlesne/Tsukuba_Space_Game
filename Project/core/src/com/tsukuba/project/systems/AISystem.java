@@ -30,6 +30,9 @@ public class AISystem extends IteratingSystem {
 
     @Override
     protected void processEntity(final Entity entity, float deltaTime) {
+        if(entity.isScheduledForRemoval())
+            return;
+
         final TransformComponent transform = ComponentList.TRANSFORM.get(entity);
         final AIComponent ai = ComponentList.AI.get(entity);
         EnemyComponent.EnemyType enemyType = ComponentList.ENEMY.get(entity).type;
@@ -68,9 +71,9 @@ public class AISystem extends IteratingSystem {
                             movement.acceleration.setZero();
                             movement.velocity.scl(0.9f);
                         }
-                        if (shooterShootAccumulator > 0.25) {
+                        if (shooterShootAccumulator > 0.3) {
                             BulletFactory.shoot(engine, entity);
-                            shooterShootAccumulator -= 0.25;
+                            shooterShootAccumulator -= 0.3;
                         }
                         break;
                     case BOSS:

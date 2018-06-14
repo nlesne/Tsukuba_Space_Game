@@ -151,6 +151,8 @@ public class UpgradeScreen extends ScreenAdapter {
                     HealthComponent playerHealth = ComponentList.HEALTH.get(playerEntity);
                     playerHealth.maxHealth += 2;
 					moneyLabel.setText("Money: " + playerComponent.money);
+					coreUpgradeCost = upgrade.coreLevel * 25;
+					coreUpgradeCostLabel.setText("Cost: " + coreUpgradeCost);
 				}
 				if (upgrade.coreLevel > 2) {
 					upgrade1.setTouchable(Touchable.disabled);
@@ -168,6 +170,8 @@ public class UpgradeScreen extends ScreenAdapter {
 					upgrade.weaponLevel++;
 					playerComponent.money -= weaponUpgradeCost;
                     moneyLabel.setText("Money: " + playerComponent.money);
+					weaponUpgradeCost = upgrade.weaponLevel * 50;
+					weaponUpgradeCostLabel.setText("Cost: " + weaponUpgradeCost);
 				}
 				if (upgrade.weaponLevel > 2) {
 					upgrade2.setTouchable(Touchable.disabled);
@@ -185,7 +189,8 @@ public class UpgradeScreen extends ScreenAdapter {
 					upgrade.thrustersLevel++;
 					playerComponent.money -= thrustersUpgradeCost;
                     moneyLabel.setText("Money: " + playerComponent.money);
-					System.out.println(upgrade.thrustersLevel);
+					thrustersUpgradeCost = upgrade.thrustersLevel * 30;
+					thrustersUpgradeCostLabel.setText("Cost: " + thrustersUpgradeCost);
 				}
 				if (upgrade.thrustersLevel > 2) {
 					upgrade3.setTouchable(Touchable.disabled);

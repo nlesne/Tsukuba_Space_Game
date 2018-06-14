@@ -60,6 +60,7 @@ public class GameScreen extends ScreenAdapter {
 
 		hudCamera = engine.getSystem(RenderingSystem.class).getCamera();
 		hud.setProjectionMatrix(hudCamera.combined);
+		camera.zoom = 1.5f;
 
 		//        cameraMiniMap = new OrthographicCamera(800,480);
 		//        cameraMiniMap.zoom = 4;
@@ -134,11 +135,13 @@ public class GameScreen extends ScreenAdapter {
 		}
 
         if (Gdx.input.isKeyPressed(Input.Keys.X)) {
-			camera.zoom += camera.zoom <= 4 ? 0.02 : 0;
+			camera.zoom += camera.zoom <= 2f ? 0.02f : 0;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.C)) {
-			camera.zoom -= camera.zoom > 0.04 ? 0.02 : 0;
+			camera.zoom -= camera.zoom > 0.3f ? 0.02f : 0;
 		}
+		if (Gdx.input.isKeyPressed(Input.Keys.V))
+			camera.zoom = 1.5f;
 		if (Gdx.input.isKeyPressed(Input.Keys.Q) || Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.translate(-1, 0, 0);
 			//If the LEFT Key is pressed, translate the camera -3 units in the X-Axis
